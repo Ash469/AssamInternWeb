@@ -451,6 +451,7 @@ export default function ApplicationStatus() {
                       <div className="mt-4 flex flex-col items-center">
                         <div className="w-full h-48 bg-gray-200 rounded-lg overflow-hidden">
                           {selectedApp.documentUrl.match(/\.(jpeg|jpg|gif|png)$/i) ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img 
                               src={selectedApp.documentUrl} 
                               alt="Document Preview" 
