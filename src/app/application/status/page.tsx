@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import { FaFilter, FaDownload, FaEye, FaChevronLeft } from 'react-icons/fa';
+import Footer from '@/app/components/footer';
+import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 interface Application {
   id: string;
@@ -19,6 +21,197 @@ interface Application {
   villageWard?: string;
 }
 
+// PDF styles
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    backgroundColor: '#fff',
+    padding: 30,
+  },
+  header: {
+    fontSize: 24,
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#0d9488', // teal-600
+    fontWeight: 'bold',
+    borderBottom: '1 solid #0d9488',
+    paddingBottom: 10,
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    color: '#0d9488', // teal-600
+  },
+  detailsContainer: {
+    marginBottom: 10,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    marginBottom: 5,
+  },
+  detailLabel: {
+    width: '40%',
+    fontWeight: 'bold',
+  },
+  detailValue: {
+    width: '60%',
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  image: {
+    width: 300,
+    height: 300,
+    objectFit: 'contain',
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 0,
+    right: 0,
+    fontSize: 10,
+    textAlign: 'center',
+    color: 'grey',
+    paddingTop: 10,
+    borderTop: '1 solid #e5e7eb',
+  },
+  status: {
+    padding: '5 10',
+    borderRadius: 5,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+  },
+  approved: {
+    backgroundColor: '#10b981', // green-500
+    color: '#fff',
+  },
+  pending: {
+    backgroundColor: '#f59e0b', // amber-500
+    color: '#fff',
+  },
+  rejected: {
+    backgroundColor: '#ef4444', // red-500
+    color: '#fff',
+  },
+});
+
+// PDF Document Component
+const ApplicationPDF = ({ application }: { application: Application }) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      <Text style={styles.header}>Application Details</Text>
+      
+      <View style={styles.section}>
+        <Text style={[
+          styles.status,
+          application.status === 'Approved' ? styles.approved : 
+          application.status === 'Pending' ? styles.pending : styles.rejected
+        ]}>
+          Status: {application.status}
+        </Text>
+        
+        <Text style={styles.sectionTitle}>Personal Information</Text>
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Full Name:</Text>
+            <Text style={styles.detailValue}>{application.fullName}</Text>
+          </View>
+          
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Application ID:</Text>
+            <Text style={styles.detailValue}>{application.id}</Text>
+          </View>
+          
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Application Date:</Text>
+            <Text style={styles.detailValue}>
+              {new Date(application.createdAt).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+              })}
+            </Text>
+          </View>
+          
+          {application.age !== undefined && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Age:</Text>
+              <Text style={styles.detailValue}>{application.age} years</Text>
+            </View>
+          )}
+          
+          {application.gender && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Gender:</Text>
+              <Text style={styles.detailValue}>{application.gender}</Text>
+            </View>
+          )}
+          
+          {application.contactNumber && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Contact Number:</Text>
+              <Text style={styles.detailValue}>{application.contactNumber}</Text>
+            </View>
+          )}
+        </View>
+        
+        <Text style={styles.sectionTitle}>Application Details</Text>
+        <View style={styles.detailsContainer}>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Category:</Text>
+            <Text style={styles.detailValue}>{application.category}</Text>
+          </View>
+          
+          {application.district && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>District:</Text>
+              <Text style={styles.detailValue}>{application.district}</Text>
+            </View>
+          )}
+          
+          {application.revenueCircle && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Revenue Circle:</Text>
+              <Text style={styles.detailValue}>{application.revenueCircle}</Text>
+            </View>
+          )}
+          
+          {application.villageWard && (
+            <View style={styles.detailRow}>
+              <Text style={styles.detailLabel}>Village/Ward:</Text>
+              <Text style={styles.detailValue}>{application.villageWard}</Text>
+            </View>
+          )}
+        </View>
+        
+        {application.documentUrl && application.documentUrl.match(/\.(jpeg|jpg|gif|png)$/i) && (
+          <View style={styles.imageContainer}>
+            <Text style={styles.sectionTitle}>Attached Document</Text>
+            <Image source={application.documentUrl} style={styles.image} />
+          </View>
+        )}
+      </View>
+      
+      <Text style={styles.footer}>
+        Generated on {new Date().toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        })}
+      </Text>
+    </Page>
+  </Document>
+);
+
 export default function ApplicationStatus() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [filteredApps, setFilteredApps] = useState<Application[]>([]);
@@ -28,10 +221,9 @@ export default function ApplicationStatus() {
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  //const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000/api';
-
-  // Fetch Applications
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+  
   useEffect(() => {
     const fetchApplications = async () => {
       try {
@@ -40,8 +232,11 @@ export default function ApplicationStatus() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setApplications(data.data || []);
-        setFilteredApps(data.data || []);
+        const sortedApplications = (data.data || []).sort((a: Application, b: Application) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setApplications(sortedApplications);
+        setFilteredApps(sortedApplications);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch applications');
       } finally {
@@ -52,7 +247,6 @@ export default function ApplicationStatus() {
     fetchApplications();
   }, []);
 
-  // Handle filters
   useEffect(() => {
     let result = [...applications];
     
@@ -86,14 +280,15 @@ export default function ApplicationStatus() {
     setIsFilterOpen(!isFilterOpen);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleDownload = (_application: Application) => {
+    setIsPdfLoading(true);
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Navbar */}
       <NavBar />
-
-      {/* Hero Section */}
       <section className="bg-teal-800 text-white py-8 px-6 md:px-16 relative">
-        {/* Back Button */}
         <Link href="/userdashboard" className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center text-white bg-teal-700 hover:bg-teal-600 transition-colors px-3 py-2 rounded-lg border border-teal-500 shadow-md">
           <FaChevronLeft className="mr-1" />
           <span className="font-medium">Back</span>
@@ -104,8 +299,6 @@ export default function ApplicationStatus() {
           <p className="mt-2 text-teal-100">Track and manage your application progress</p>
         </div>
       </section>
-
-      {/* Filters Section */}
       <section className="bg-white border-b py-4 px-6 md:px-16 sticky top-0 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="text-lg font-medium text-teal-800">
@@ -174,8 +367,6 @@ export default function ApplicationStatus() {
           </div>
         </div>
       </section>
-
-      {/* Main Content */}
       <section className="bg-gray-100 py-8 px-6 md:px-16 min-h-screen">
         <div className="max-w-7xl mx-auto">
           {loading ? (
@@ -225,8 +416,6 @@ export default function ApplicationStatus() {
                       {application.status}
                     </span>
                   </div>
-                  
-                  {/* Card Body */}
                   <div className="p-4">
                     <div className="grid grid-cols-2 gap-4 mb-4">
                       <div>
@@ -240,8 +429,6 @@ export default function ApplicationStatus() {
                         </div>
                       )}
                     </div>
-                    
-                    {/* Card Actions */}
                     <div className="flex justify-between mt-4 pt-3 border-t border-gray-100">
                       <button
                         onClick={() => setSelectedApp(application)}
@@ -250,14 +437,22 @@ export default function ApplicationStatus() {
                         <FaEye className="mr-1" /> View Details
                       </button>
                       {application.documentUrl && (
-                        <a
-                          href={application.documentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <PDFDownloadLink
+                          document={<ApplicationPDF application={application} />}
+                          fileName={`application-${application.id}.pdf`}
                           className="flex items-center text-sm text-teal-600 hover:text-teal-800"
+                          onClick={() => handleDownload(application)}
                         >
-                          <FaDownload className="mr-1" /> Download
-                        </a>
+                          {({ loading,}) => 
+                            loading ? (
+                              <span>Loading document...</span>
+                            ) : (
+                              <>
+                                <FaDownload className="mr-1" /> Download PDF
+                              </>
+                            )
+                          }
+                        </PDFDownloadLink>
                       )}
                     </div>
                   </div>
@@ -267,8 +462,6 @@ export default function ApplicationStatus() {
           )}
         </div>
       </section>
-
-      {/* View Details Modal */}
       {selectedApp && (
         <div className="fixed z-20 inset-0 overflow-y-auto">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -277,7 +470,6 @@ export default function ApplicationStatus() {
             </div>
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-              {/* Modal Header */}
               <div className="bg-teal-800 px-6 py-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium text-white">Application Details</h3>
@@ -289,8 +481,6 @@ export default function ApplicationStatus() {
                   </button>
                 </div>
               </div>
-              
-              {/* Modal Body */}
               <div className="bg-white px-6 pt-5 pb-6">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                   <div className="flex items-center">
@@ -301,21 +491,13 @@ export default function ApplicationStatus() {
                     </div>
                     <div>
                       <h4 className="text-xl font-medium text-gray-900">{selectedApp.fullName}</h4>
-                      <p className="text-sm text-gray-500 flex items-center mt-1">
-                        <span className="inline-block w-2 h-2 rounded-full bg-teal-500 mr-2"></span>
-                        Application ID: {selectedApp.id ? selectedApp.id.substring(0, 8) : 'N/A'}
-                      </p>
                     </div>
                   </div>
                   <span className={`px-4 py-1.5 rounded-full text-sm font-medium ${getStatusColor(selectedApp.status)} shadow-sm`}>
                     {selectedApp.status}
                   </span>
                 </div>
-                
-                {/* Grid of detail sections */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                  {/* Fixed key warning by separating the conditional rendering from the list */}
-                  {/* Personal Details Section */}
                   <div key="personal-details-section" className="bg-gray-50 rounded-lg p-5 shadow-sm">
                     <h5 className="font-medium text-teal-800 border-b border-gray-200 pb-2 flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -325,7 +507,6 @@ export default function ApplicationStatus() {
                     </h5>
                     
                     <div className="space-y-3 mt-4">
-                      {/* Create an array of valid details first, then map through it */}
                       {(() => {
                         const details = [];
                         if (selectedApp.age !== undefined) {
@@ -356,15 +537,11 @@ export default function ApplicationStatus() {
                           <span className="text-base font-medium">{detail.value}</span>
                         </div>
                       ))}
-                      
-                      {/* Show message if no personal details available */}
                       {!selectedApp.age && !selectedApp.gender && !selectedApp.contactNumber && (
                         <p className="text-gray-500 italic">No personal details available</p>
                       )}
                     </div>
                   </div>
-                  
-                  {/* Application Details Section */}
                   <div key="application-details-section" className="bg-gray-50 rounded-lg p-5 shadow-sm">
                     <h5 className="font-medium text-teal-800 border-b border-gray-200 pb-2 flex items-center">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -391,8 +568,6 @@ export default function ApplicationStatus() {
                       </div>
                     </div>
                   </div>
-                  
-                  {/* Location Details Section */}
                   {(selectedApp.district || selectedApp.revenueCircle || selectedApp.villageWard) && (
                     <div key="location-details-section" className="bg-gray-50 rounded-lg p-5 shadow-sm md:col-span-2">
                       <h5 className="font-medium text-teal-800 border-b border-gray-200 pb-2 flex items-center">
@@ -437,8 +612,6 @@ export default function ApplicationStatus() {
                       </div>
                     </div>
                   )}
-                  
-                  {/* Document Preview Section */}
                   {selectedApp.documentUrl && (
                     <div key="document-preview-section" className="md:col-span-2 bg-gray-50 rounded-lg p-5 shadow-sm">
                       <h5 className="font-medium text-teal-800 border-b border-gray-200 pb-2 flex items-center">
@@ -465,21 +638,26 @@ export default function ApplicationStatus() {
                             </div>
                           )}
                         </div>
-                        <a
-                          href={selectedApp.documentUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <PDFDownloadLink
+                          document={<ApplicationPDF application={selectedApp} />}
+                          fileName={`application-${selectedApp.id}.pdf`}
                           className="mt-4 inline-flex items-center px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700"
                         >
-                          <FaDownload className="mr-2" /> Download Document
-                        </a>
+                          {({  loading, }) => 
+                            loading ? (
+                              <span>Preparing document...</span>
+                            ) : (
+                              <>
+                                <FaDownload className="mr-2" /> Download PDF
+                              </>
+                            )
+                          }
+                        </PDFDownloadLink>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
-              
-              {/* Modal Footer */}
               <div className="bg-gray-50 px-6 py-4 flex justify-end">
                 <button
                   type="button"
@@ -493,6 +671,7 @@ export default function ApplicationStatus() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }

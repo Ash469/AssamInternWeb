@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { FaSync, FaFilter, FaEye, FaTimes, FaCheck } from 'react-icons/fa';
 import Image from 'next/image';
+import Footer from '@/app/components/footer';
 
 interface User {
   id: string;
@@ -53,7 +54,7 @@ const AdminUser: React.FC = () => {
         gender: u.gender,
         verified: u.verified,
         createdAt: new Date(u.createdAt).toLocaleDateString(),
-      }));
+      })).reverse(); 
 
       setUsers(mapped);
       setError(null);
@@ -99,7 +100,7 @@ const AdminUser: React.FC = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Header Section */}
       <header
         className="relative min-h-[300px] sm:h-[400px] bg-cover bg-center"
@@ -112,7 +113,7 @@ const AdminUser: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
             <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-white shadow-2xl overflow-hidden">
               <Image
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="Logo"
                 fill
                 sizes="(max-width: 640px) 96px, 128px"
@@ -136,7 +137,7 @@ const AdminUser: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="relative -mt-20 sm:-mt-32 z-10 container mx-auto px-4 sm:px-8">
+      <main className="relative -mt-20 sm:-mt-32 z-10 container mx-auto px-4 sm:px-8 flex-grow pb-16">
         <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
           {/* Filter Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -182,7 +183,7 @@ const AdminUser: React.FC = () => {
             </div>
           ) : (
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-              {filteredUsers.map((user, index) => ( // Changed from users.map to filteredUsers.map
+              {filteredUsers.map((user, index) => (
                 <div key={user.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-3">
@@ -221,6 +222,11 @@ const AdminUser: React.FC = () => {
           )}
         </div>
       </main>
+
+      {/* Add Footer at the bottom */}
+      <div className="mt-auto">
+        <Footer />
+      </div>
 
       {/* User Details Modal */}
       {selectedUser && (

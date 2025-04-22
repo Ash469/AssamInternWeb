@@ -176,13 +176,23 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <div className="mt-6 text-center">
-              <Link 
-                href="/"
-                className="text-teal-600 hover:text-teal-800 transition-colors"
-              >
-                Back to Home
-              </Link>
+            <div className="mt-6 text-center space-y-3">
+              <div>
+                <Link 
+                  href="/forgot-password"
+                  className="text-teal-600 hover:text-teal-800 transition-colors"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
+              <div>
+                <Link 
+                  href="/"
+                  className="text-teal-600 hover:text-teal-800 transition-colors"
+                >
+                  Back to Home
+                </Link>
+              </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
+import Footer from '../components/footer'
 import NavBar from '../components/nav_bar'
 import { FaBuilding, FaUsers, FaHeadset } from 'react-icons/fa'
-import Link from 'next/link'
 // import Spline from '@splinetool/react-spline'
 
 export default function About() {
@@ -94,22 +94,7 @@ export default function About() {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-10 px-6 md:px-16 text-center">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-2xl font-bold text-teal-800 mb-4">Ready to Transform Your Office Management?</h2>
-          <p className="text-gray-700 mb-6">
-            Experience the difference our office dashboard can make in your daily operations.
-          </p>
-          <Link 
-            href="/userdashboard" 
-            className="inline-block px-8 py-3 bg-teal-600 text-white font-medium rounded-full hover:bg-teal-700 transition-colors"
-          >
-            Get Started
-          </Link>
-        </div>
-      </section>
+      <Footer />
     </div>
   )
 }

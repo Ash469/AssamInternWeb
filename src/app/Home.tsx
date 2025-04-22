@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { FaUserShield, FaUser, FaSignInAlt, FaStream, FaGlobeAmericas } from "react-icons/fa";
+import Footer from "./components/footer";
 
 const Home = () => {
   const [selectedRole, setSelectedRole] = useState<'none' | 'admin' | 'user'>('none');
@@ -178,6 +179,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

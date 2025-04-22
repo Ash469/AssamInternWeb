@@ -1,9 +1,10 @@
 "use client"
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FaUser, FaEnvelope, FaPhone, FaSignOutAlt } from 'react-icons/fa'
 import jwt_decode from 'jwt-decode'
+import NavBar from '../components/nav_bar'
+import Footer from '../components/footer'
 
 interface UserProfile {
   _id?: string;
@@ -25,21 +26,17 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000/api';
-  
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         setLoading(true)
         
-        // Get token from localStorage
         const token = localStorage.getItem('token')
         
         if (!token) {
           throw new Error('No authentication token found')
         }
         
-        // Decode token to get user ID
         let userId = null
         try {
           const decoded = jwt_decode(token) as { 
@@ -62,7 +59,6 @@ export default function ProfilePage() {
         const data = await response.json()
         
         if (data.users && data.users.length > 0) {
-          // If we have userId from token, find matching user
           if (userId) {
             const loggedInUser = data.users.find((user: UserProfile) => 
               user._id === userId || user.userId === userId
@@ -71,13 +67,10 @@ export default function ProfilePage() {
             if (loggedInUser) {
               setUserProfile(loggedInUser)
             } else {
-              // If user not found but we have others, use the first one
-              // This is a fallback in case token ID doesn't match
               setUserProfile(data.users[0])
               console.warn('Logged in user not found in user list, showing first user')
             }
           } else {
-            // No userId from token, use first user as fallback
             setUserProfile(data.users[0])
           }
         } else {
@@ -112,147 +105,158 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+      <div className="min-h-screen bg-white flex flex-col">
+        <NavBar />
+        <div className="flex justify-center items-center flex-grow">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
+        </div>
+        <Footer />
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="max-w-4xl mx-auto py-8 px-4 text-center">
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          <p>Error: {error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="mt-2 bg-red-100 hover:bg-red-200 text-red-800 font-bold py-2 px-4 rounded"
-          >
-            Retry
-          </button>
+      <div className="min-h-screen bg-white flex flex-col">
+        <NavBar />
+        <div className="max-w-4xl mx-auto py-8 px-4 text-center flex-grow">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <p>Error: {error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-2 bg-red-100 hover:bg-red-200 text-red-800 font-bold py-2 px-4 rounded"
+            >
+              Retry
+            </button>
+          </div>
         </div>
+        <Footer />
       </div>
     )
   }
 
   if (!userProfile) {
     return (
-      <div className="max-w-4xl mx-auto py-8 px-4 text-center">
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
-          <p>No user profile found</p>
+      <div className="min-h-screen bg-white flex flex-col">
+        <NavBar />
+        <div className="max-w-4xl mx-auto py-8 px-4 text-center flex-grow">
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
+            <p>No user profile found</p>
+          </div>
         </div>
+        <Footer />
       </div>
     )
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <div className="bg-white shadow-md rounded-lg overflow-hidden">
-        <div className="bg-teal-700 text-white p-6">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">My Profile</h1>
-            
-            <button 
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-md hover:bg-red-50 transition-colors"
-            >
-              <FaSignOutAlt />
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-        
-        <div className="p-6">
-          <div className="flex flex-col md:flex-row gap-6">
-            <div className="flex flex-col items-center mb-6 md:mb-0">
-              <div className="bg-gray-200 rounded-full p-6 mb-4">
-                <FaUser size={80} className="text-gray-500" />
+    <div className="min-h-screen bg-white flex flex-col">
+      <NavBar />
+      
+      <main className="flex-grow bg-gray-100">
+        <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+          <div className="bg-white shadow-md rounded-lg overflow-hidden">
+            <div className="bg-teal-700 text-white p-6">
+              <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold">My Profile</h1>
+                
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 bg-white text-red-600 px-4 py-2 rounded-md hover:bg-red-50 transition-colors"
+                >
+                  <FaSignOutAlt />
+                  <span>Logout</span>
+                </button>
               </div>
-              <h2 className="text-xl font-semibold text-gray-800">{getFullName(userProfile)}</h2>
-              <p className="text-gray-600">User ID: {userProfile?.userId || "N/A"}</p>
             </div>
             
-            <div className="flex-1 space-y-4">
-              <h3 className="text-lg font-semibold border-b pb-2">Personal Information</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Full Name</p>
-                    <p className="font-medium flex items-center gap-2">
-                      <FaUser className="text-teal-600" />
-                      {getFullName(userProfile)}
-                    </p>
+            <div className="p-6">
+              <div className="flex flex-col md:flex-row gap-6">
+                <div className="flex flex-col items-center mb-6 md:mb-0">
+                  <div className="bg-gray-200 rounded-full p-6 mb-4">
+                    <FaUser size={80} className="text-gray-500" />
                   </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-500">Email Address</p>
-                    <p className="font-medium flex items-center gap-2">
-                      <FaEnvelope className="text-teal-600" />
-                      {userProfile?.email || "Not provided"}
-                    </p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-500">Contact Number</p>
-                    <p className="font-medium flex items-center gap-2">
-                      <FaPhone className="text-teal-600" />
-                      {userProfile?.contactNumber || "Not provided"}
-                    </p>
-                  </div>
+                  <h2 className="text-xl font-semibold text-gray-800">{getFullName(userProfile)}</h2>
+                  <p className="text-gray-600">User ID: {userProfile?.userId || "N/A"}</p>
                 </div>
                 
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500">Gender</p>
+                <div className="flex-1 space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2">Personal Information</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-500">Full Name</p>
+                        <p className="font-medium flex items-center gap-2">
+                          <FaUser className="text-teal-600" />
+                          {getFullName(userProfile)}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-500">Email Address</p>
+                        <p className="font-medium flex items-center gap-2">
+                          <FaEnvelope className="text-teal-600" />
+                          {userProfile?.email || "Not provided"}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-500">Contact Number</p>
+                        <p className="font-medium flex items-center gap-2">
+                          <FaPhone className="text-teal-600" />
+                          {userProfile?.contactNumber || "Not provided"}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm text-gray-500">Gender</p>
+                        <p className="font-medium">
+                          {userProfile?.gender || "Not specified"}
+                        </p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-500">Age</p>
+                        <p className="font-medium">{userProfile?.age || "Not specified"}</p>
+                      </div>
+                      
+                      <div>
+                        <p className="text-sm text-gray-500">User ID</p>
+                        <p className="font-medium">{userProfile?.userId || userProfile?._id || "N/A"}</p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-6">
+                    <p className="text-sm text-gray-500">Account Created</p>
                     <p className="font-medium">
-                      {userProfile?.gender || "Not specified"}
+                      {userProfile?.createdAt ? 
+                        new Date(userProfile.createdAt).toLocaleDateString() : 
+                        "Not available"}
                     </p>
                   </div>
                   
-                  <div>
-                    <p className="text-sm text-gray-500">Age</p>
-                    <p className="font-medium">{userProfile?.age || "Not specified"}</p>
-                  </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-500">User ID</p>
-                    <p className="font-medium">{userProfile?.userId || userProfile?._id || "N/A"}</p>
-                  </div>
+                  {userProfile?.verified !== undefined && (
+                    <div className="mt-6 p-3 bg-gray-50 rounded-md">
+                      <p className="text-sm font-medium">
+                        Account Status: 
+                        <span className={userProfile.verified ? "text-green-600 ml-2" : "text-yellow-600 ml-2"}>
+                          {userProfile.verified ? "Verified" : "Not Verified"}
+                        </span>
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-              
-              <div className="mt-6">
-                <p className="text-sm text-gray-500">Account Created</p>
-                <p className="font-medium">
-                  {userProfile?.createdAt ? 
-                    new Date(userProfile.createdAt).toLocaleDateString() : 
-                    "Not available"}
-                </p>
-              </div>
-              
-              {userProfile?.verified !== undefined && (
-                <div className="mt-6 p-3 bg-gray-50 rounded-md">
-                  <p className="text-sm font-medium">
-                    Account Status: 
-                    <span className={userProfile.verified ? "text-green-600 ml-2" : "text-yellow-600 ml-2"}>
-                      {userProfile.verified ? "Verified" : "Not Verified"}
-                    </span>
-                  </p>
-                </div>
-              )}
             </div>
           </div>
         </div>
-        
-        <div className="bg-gray-50 px-6 py-4 border-t">
-          <Link 
-            href="/userdashboard" 
-            className="text-teal-600 hover:text-teal-800 font-medium"
-          >
-            Back to Dashboard
-          </Link>
-        </div>
-      </div>
+      </main>
+      
+      <Footer />
     </div>
   )
 }

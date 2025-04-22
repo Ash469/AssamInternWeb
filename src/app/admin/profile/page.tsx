@@ -1,5 +1,6 @@
 'use client';
 
+import Footer from '@/app/components/footer';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaUserShield, FaSignOutAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
@@ -17,17 +18,23 @@ export default function AdminProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <header className="bg-teal-800 py-6 px-8 shadow-lg">
-        <h1 className="text-5xl font-bold text-white text-center tracking-wide">
-          Admin Profile
-        </h1>
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      <header 
+        className="relative min-h-[200px] bg-cover bg-center" 
+        style={{ 
+          backgroundImage: "linear-gradient(rgba(13, 148, 136, 0.9), rgba(13, 148, 136, 0.8)), url(/app_bar.png)"
+        }}
+      >
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-white text-center tracking-wide">
+            Admin Profile
+          </h1>
+        </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
+      <main className="flex-grow relative -mt-20 z-10 container mx-auto px-4 pb-12">
         <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
           <div className="flex flex-col md:flex-row">
-            {/* Left Panel - Profile Info */}
             <div className="md:w-1/2 bg-teal-700 p-8 flex flex-col items-center justify-center">
               <div className="w-40 h-40 rounded-full bg-white/10 backdrop-blur-sm 
                             flex items-center justify-center text-white text-6xl 
@@ -41,8 +48,6 @@ export default function AdminProfilePage() {
               <h2 className="text-3xl font-bold text-white mb-2">Admin User</h2>
               <p className="text-teal-100">@admin123</p>
             </div>
-
-            {/* Right Panel - Details */}
             <div className="md:w-1/2 p-8">
               <div className="space-y-6">
                 <h3 className="text-2xl font-bold text-teal-800 mb-6">
@@ -83,6 +88,9 @@ export default function AdminProfilePage() {
             </div>
           </div>
         </div>
+      </main>
+      <div className="mt-auto">
+        <Footer />
       </div>
     </div>
   );

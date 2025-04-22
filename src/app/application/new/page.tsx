@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import { FaFileAlt, FaCloudUploadAlt, FaChevronLeft } from 'react-icons/fa';
+import Footer from '@/app/components/footer';
 
 const NewApplicationPage = () => {
   const [form, setForm] = useState({
@@ -18,8 +19,6 @@ const NewApplicationPage = () => {
     remarks: '',
     documentUrl: '',
   });
-
-  // Add file upload state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
@@ -68,8 +67,6 @@ const NewApplicationPage = () => {
       setUploadStatus(`Selected: ${file.name}`);
     }
   };
-
-  // Trigger file input click
   const triggerFileInput = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -114,12 +111,10 @@ const NewApplicationPage = () => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-    setSubmitSuccess(false); // Reset success state
+    setSubmitSuccess(false);
 
     try {
       let documentUrl = form.documentUrl;
-
-      // Upload file if selected
       if (selectedFile) {
         documentUrl = await uploadToCloudinary(selectedFile) || '';
         
@@ -424,6 +419,10 @@ const NewApplicationPage = () => {
               </div>
             </div>
 
+            <div className="text-left text-s text-gray-500">
+              <p>* Required fields</p>
+            </div>
+
             {/* Success Message - displays above submit button */}
             {submitSuccess && (
               <div className="bg-green-100 p-4 rounded-lg border border-green-300 text-center">
@@ -457,13 +456,10 @@ const NewApplicationPage = () => {
                 </span>
               </button>
             </div>
-
-            <div className="text-center text-xs text-gray-500">
-              <p>* Required fields</p>
-            </div>
           </form>
         </div>
       </section>
+      <Footer />
     </div>
   );
 };

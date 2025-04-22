@@ -1,7 +1,8 @@
 "use client";
-/* eslint-disable @next/next/no-img-element */
 import { useEffect, useState } from "react";
 import axios from "axios";
+import Footer from "@/app/components/footer";
+import Image from "next/image";
 
 export default function AdminHome() {
   const [adminName, setAdminName] = useState("Admin");
@@ -9,7 +10,6 @@ export default function AdminHome() {
   const [verifiedUsers, setVerifiedUsers] = useState(0);
   const [pendingUsers, setPendingUsers] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
 
   useEffect(() => {
     loadAdminData();
@@ -23,9 +23,6 @@ export default function AdminHome() {
       setAdminName(userData.firstName || "Admin");
     }
   };
-  
-   //const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:10000';
-  //  const apiUrl = 'http://localhost:10000';
 
   const fetchUserData = async () => {
     try {
@@ -33,7 +30,7 @@ export default function AdminHome() {
       const users = res.data.users;
       const verified = users.filter((user: { verified: boolean }) => user.verified).length;
       const pending = users.filter((user: { verified: boolean }) => !user.verified).length;
-      
+
       setTotalUsers(users.length);
       setVerifiedUsers(verified);
       setPendingUsers(pending);
@@ -47,7 +44,7 @@ export default function AdminHome() {
   return (
     <div className="min-h-screen bg-gray-100">
       <header 
-        className="relative min-h-[300px] sm:h-[400px] bg-cover bg-center" 
+        className="relative min-h-[250px] sm:h-[300px] bg-cover bg-center" 
         style={{ 
           backgroundImage: "linear-gradient(rgba(13, 148, 136, 0.9), rgba(13, 148, 136, 0.8)), url(/app_bar.png)"
         }}
@@ -55,18 +52,20 @@ export default function AdminHome() {
         <div className="container mx-auto px-4 sm:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center py-6">
             <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-              <img 
-                src="/logo.jpg" 
-                alt="Logo" 
-                className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-white shadow-2xl" 
+              <Image 
+              src="/logo.png" 
+              alt="Logo" 
+              width={128}
+              height={128}
+              className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-white shadow-2xl" 
               />
               <div className="mt-4 sm:mt-0 sm:ml-4">
-                <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-wide">
-                  Welcome {adminName}
-                </h1>
-                <p className="text-xl sm:text-2xl text-teal-100 mt-2">
-                  Admin Dashboard
-                </p>
+              <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-wide">
+                Welcome {adminName}
+              </h1>
+              <p className="text-xl sm:text-2xl text-teal-100 mt-2">
+                Admin Dashboard
+              </p>
               </div>
             </div>
             
@@ -81,7 +80,7 @@ export default function AdminHome() {
         </div>
       </header>
 
-      <main className="relative -mt-20 sm:-mt-32 z-10 container mx-auto px-4 sm:px-8">
+      <main className="relative -mt-24 sm:-mt-34 z-10 container mx-auto px-4 sm:px-8">
         <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {menuItems.map((item, i) => (
             <div
@@ -97,7 +96,7 @@ export default function AdminHome() {
           ))}
         </div>
 
-        <div className="mt-6 sm:mt-10">
+        <div className="mt-6 sm:mt-10 mb-4">
           <h2 className="text-base sm:text-lg font-semibold text-black mb-4">Dashboard Statistics</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <StatCard 
@@ -127,13 +126,15 @@ export default function AdminHome() {
           </div>
         </div>
       </main>
+      <div className="py-6 sm:py-3"></div>
+      <Footer />
     </div>
   );
 }
 
 const StatCard = ({ title, value, icon }: { title: string, value: string, color: string, icon: string }) => (
-  <div className="bg-white p-4 sm:p-6 rounded-xl shadow-lg flex items-center gap-3 sm:gap-4 border border-teal-100 hover:shadow-xl transition-shadow">
-    <div className="text-2xl sm:text-3xl">{icon}</div>
+  <div className="bg-white p-3 sm:p-5 rounded-xl shadow-lg flex items-center gap-3 sm:gap-4 border border-teal-100 hover:shadow-xl transition-shadow">
+    <div className="text-xl sm:text-2xl">{icon}</div>
     <div>
       <p className="text-xs sm:text-sm text-teal-600 font-medium">{title}</p>
       <p className="text-xl sm:text-2xl font-bold text-teal-800">{value}</p>

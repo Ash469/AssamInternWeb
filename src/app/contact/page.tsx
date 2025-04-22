@@ -1,10 +1,10 @@
 'use client';
-
 import { useState } from 'react';
 import axios from 'axios';
 import { FaEnvelope, FaUser, FaPhone, FaCommentAlt, FaPaperPlane } from 'react-icons/fa';
 import NavBar from '../components/nav_bar';
-import Spline from '@splinetool/react-spline';
+import Footer from '../components/footer';
+// import Spline from '@splinetool/react-spline';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -21,8 +21,6 @@ const Contact = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
-  //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000/api';
 
   const validate = () => {
     const { fullName, email, contactNumber, message } = formData;
@@ -56,7 +54,7 @@ const Contact = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        withCredentials: true, // Include if your API uses cookies/sessions
+        withCredentials: true,
       });
       if (response.status === 200 || response.status === 201) {
         setSubmitted(true);
@@ -73,44 +71,33 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <NavBar />
-      
-      {/* Hero Section */}
-      <section className="relative h-[300px] overflow-hidden">
+      <section className="relative h-[200px] overflow-hidden">
         {/* Spline background */}
         <div className="absolute inset-0 w-full h-full">
           <div className="absolute inset-0 bg-green-500/30 z-[1]"></div>
-          <Spline 
+          {/* <Spline 
             scene="https://prod.spline.design/Pogqf2P4pTEDp9b5/scene.splinecode" 
-          />
+          /> */}
         </div>
-
-        {/* Text content overlay */}
         <div className="relative z-10 h-full flex items-center justify-center">
           <div className="text-center max-w-2xl px-6">
-            <h2 className="text-4xl font-bold mb-4 text-black">
-              Connect with Us
-            </h2>
-            <p className="text-lg text-black/80">
-              Have questions or feedback? We&apos;re here to help. Reach out to our team.
-            </p>
+            <h2 className="text-3xl font-bold mb-2 text-black">Connect with Us</h2>
+            <p className="text-base text-black/80">Have questions or feedback? We&apos;re here to help.</p>
           </div>
         </div>
       </section>
 
-      <div className="max-w-4xl mx-auto px-4 py-10">
+      <div className="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="md:flex">
-            {/* Left column - Contact Info */}
-            <div className="bg-teal-700 text-white p-8 md:w-1/3">
-              <h2 className="text-xl font-bold mb-6">Contact Information</h2>
+            <div className="bg-teal-700 text-white p-8 md:w-2/5">
+              <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
               
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div className="flex items-start">
-                  <div className="mt-1 mr-3">
-                    <FaEnvelope />
-                  </div>
+                  <FaEnvelope className="mt-1 mr-3 flex-shrink-0 text-base" />
                   <div>
                     <p className="font-medium">Email</p>
                     <p className="text-sm text-white/90">support@officemgmt.gov.in</p>
@@ -118,9 +105,7 @@ const Contact = () => {
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="mt-1 mr-3">
-                    <FaPhone />
-                  </div>
+                  <FaPhone className="mt-1 mr-3 flex-shrink-0 text-base" />
                   <div>
                     <p className="font-medium">Phone</p>
                     <p className="text-sm text-white/90">+91 1234567890</p>
@@ -128,9 +113,7 @@ const Contact = () => {
                 </div>
                 
                 <div className="flex items-start">
-                  <div className="mt-1 mr-3">
-                    <FaUser />
-                  </div>
+                  <FaUser className="mt-1 mr-3 flex-shrink-0 text-base" />
                   <div>
                     <p className="font-medium">Office Hours</p>
                     <p className="text-sm text-white/90">Monday - Friday: 9 AM - 5 PM</p>
@@ -138,13 +121,11 @@ const Contact = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Right column - Contact Form */}
-            <div className="p-8 md:w-2/3">
+            <div className="p-8 md:w-3/5">
               {submitted && (
-                <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-6 flex items-center">
-                  <div className="bg-green-200 rounded-full p-2 mr-3">
-                    <svg className="w-6 h-6 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-5 flex items-center">
+                  <div className="bg-green-200 rounded-full p-1 mr-3">
+                    <svg className="w-5 h-5 text-green-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
@@ -153,9 +134,9 @@ const Contact = () => {
               )}
 
               {errorMessage && (
-                <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-6 flex items-center">
-                  <div className="bg-red-200 rounded-full p-2 mr-3">
-                    <svg className="w-6 h-6 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-red-100 text-red-700 p-4 rounded-lg mb-5 flex items-center">
+                  <div className="bg-red-200 rounded-full p-1 mr-3">
+                    <svg className="w-5 h-5 text-red-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </div>
@@ -163,7 +144,7 @@ const Contact = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-teal-600">
                     <FaUser />
@@ -241,6 +222,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

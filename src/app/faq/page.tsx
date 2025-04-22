@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import NavBar from '../components/nav_bar';
 import { FaChevronDown, FaChevronUp} from 'react-icons/fa';
+import Footer from '../components/footer';
 // import Spline from '@splinetool/react-spline';
 
 export default function FAQPage() {
@@ -110,23 +111,25 @@ export default function FAQPage() {
           </div>
 
           {/* Contact Section */}
-          <div className="bg-teal-50 rounded-xl shadow-sm p-6 mt-8 border border-teal-100">
-            <h3 className="text-lg font-semibold text-teal-800 mb-2">
-              Still have questions?
-            </h3>
-            <p className="text-gray-700 mb-4">
-              Our support team is here to help with any questions you may have about using our services.
-            </p>
-            <div className="flex space-x-4">
+          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg shadow-sm p-5 mt-6 border border-teal-100 flex flex-col md:flex-row items-center justify-between">
+            <div className="mb-3 md:mb-0">
+              <h3 className="text-lg font-semibold text-teal-800 mb-1">
+                Still have questions?
+              </h3>
+              <p className="text-gray-700 text-sm">
+                Our support team is here to help with any questions.
+              </p>
+            </div>
+            <div className="flex space-x-3">
               <a 
                 href="mailto:support@example.com" 
-                className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition"
+                className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition text-sm font-medium flex items-center justify-center"
               >
-                Email
+                Email Us
               </a>
               <a 
                 href="/contact" 
-                className="px-4 py-2 bg-white border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50 transition"
+                className="px-4 py-2 bg-white border border-teal-600 text-teal-600 rounded-md hover:bg-teal-50 transition text-sm font-medium flex items-center justify-center"
               >
                 Help Center
               </a>
@@ -134,6 +137,7 @@ export default function FAQPage() {
           </div>
         </div>
       </section>
+      <Footer />
     </div>
   );
 }
