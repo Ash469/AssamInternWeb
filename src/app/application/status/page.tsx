@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
-import { FaFilter, FaDownload, FaEye, FaChevronLeft } from 'react-icons/fa';
+import { FaFilter, FaDownload, FaEye, FaChevronLeft, FaFileAlt } from 'react-icons/fa';
 import Footer from '@/app/components/footer';
 import { PDFDownloadLink, Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
@@ -119,17 +119,17 @@ const ApplicationPDF = ({ application }: { application: Application }) => (
         
         <Text style={styles.sectionTitle}>Personal Information</Text>
         <View style={styles.detailsContainer}>
-          <View style={styles.detailRow}>
+          <View key="fullName" style={styles.detailRow}>
             <Text style={styles.detailLabel}>Full Name:</Text>
             <Text style={styles.detailValue}>{application.fullName}</Text>
           </View>
           
-          <View style={styles.detailRow}>
+          <View key="applicationId" style={styles.detailRow}>
             <Text style={styles.detailLabel}>Application ID:</Text>
             <Text style={styles.detailValue}>{application.id}</Text>
           </View>
           
-          <View style={styles.detailRow}>
+          <View key="applicationDate" style={styles.detailRow}>
             <Text style={styles.detailLabel}>Application Date:</Text>
             <Text style={styles.detailValue}>
               {new Date(application.createdAt).toLocaleDateString('en-US', { 
@@ -141,21 +141,21 @@ const ApplicationPDF = ({ application }: { application: Application }) => (
           </View>
           
           {application.age !== undefined && (
-            <View style={styles.detailRow}>
+            <View key="age" style={styles.detailRow}>
               <Text style={styles.detailLabel}>Age:</Text>
               <Text style={styles.detailValue}>{application.age} years</Text>
             </View>
           )}
           
           {application.gender && (
-            <View style={styles.detailRow}>
+            <View key="gender" style={styles.detailRow}>
               <Text style={styles.detailLabel}>Gender:</Text>
               <Text style={styles.detailValue}>{application.gender}</Text>
             </View>
           )}
           
           {application.contactNumber && (
-            <View style={styles.detailRow}>
+            <View key="contactNumber" style={styles.detailRow}>
               <Text style={styles.detailLabel}>Contact Number:</Text>
               <Text style={styles.detailValue}>{application.contactNumber}</Text>
             </View>
@@ -164,27 +164,27 @@ const ApplicationPDF = ({ application }: { application: Application }) => (
         
         <Text style={styles.sectionTitle}>Application Details</Text>
         <View style={styles.detailsContainer}>
-          <View style={styles.detailRow}>
+          <View key="category" style={styles.detailRow}>
             <Text style={styles.detailLabel}>Category:</Text>
             <Text style={styles.detailValue}>{application.category}</Text>
           </View>
           
           {application.district && (
-            <View style={styles.detailRow}>
+            <View key="district" style={styles.detailRow}>
               <Text style={styles.detailLabel}>District:</Text>
               <Text style={styles.detailValue}>{application.district}</Text>
             </View>
           )}
           
           {application.revenueCircle && (
-            <View style={styles.detailRow}>
+            <View key="revenueCircle" style={styles.detailRow}>
               <Text style={styles.detailLabel}>Revenue Circle:</Text>
               <Text style={styles.detailValue}>{application.revenueCircle}</Text>
             </View>
           )}
           
           {application.villageWard && (
-            <View style={styles.detailRow}>
+            <View key="villageWard" style={styles.detailRow}>
               <Text style={styles.detailLabel}>Village/Ward:</Text>
               <Text style={styles.detailValue}>{application.villageWard}</Text>
             </View>
@@ -288,15 +288,24 @@ export default function ApplicationStatus() {
   return (
     <div className="min-h-screen bg-white">
       <NavBar />
-      <section className="bg-teal-800 text-white py-8 px-6 md:px-16 relative">
+      <section className="bg-teal-800 text-white py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between relative">
+        {/* Back Button */}
         <Link href="/userdashboard" className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center text-white bg-teal-700 hover:bg-teal-600 transition-colors px-3 py-2 rounded-lg border border-teal-500 shadow-md">
           <FaChevronLeft className="mr-1" />
           <span className="font-medium">Back</span>
         </Link>
         
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold">Application Status</h1>
-          <p className="mt-2 text-teal-100">Track and manage your application progress</p>
+        {/* Text content */}
+        <div className="w-full md:w-1/2 text-center md:text-left mt-8 md:mt-0">
+          <h2 className="text-3xl font-bold mb-4">Application Status</h2>
+          <p className="text-sm text-white/90">Track and manage your application progress</p>
+        </div>
+
+        {/* Placeholder image */}
+        <div className="w-full md:w-1/2 flex justify-center mt-6 md:mt-0">
+          <div className="w-64 h-40 bg-white/20 rounded-lg border border-white/50 flex items-center justify-center">
+            <FaFileAlt className="text-4xl text-white/80" />
+          </div>
         </div>
       </section>
       <section className="bg-white border-b py-4 px-6 md:px-16 sticky top-0 z-10 shadow-sm">
@@ -418,12 +427,12 @@ export default function ApplicationStatus() {
                   </div>
                   <div className="p-4">
                     <div className="grid grid-cols-2 gap-4 mb-4">
-                      <div>
+                      <div key={`category-${application.id}`}>
                         <p className="text-xs text-gray-500">Category</p>
                         <p className="text-sm font-medium">{application.category}</p>
                       </div>
                       {application.district && (
-                        <div>
+                        <div key={`district-${application.id}`}>
                           <p className="text-xs text-gray-500">District</p>
                           <p className="text-sm font-medium">{application.district}</p>
                         </div>
@@ -438,12 +447,13 @@ export default function ApplicationStatus() {
                       </button>
                       {application.documentUrl && (
                         <PDFDownloadLink
+                          key={`pdf-link-${application.id}`}
                           document={<ApplicationPDF application={application} />}
                           fileName={`application-${application.id}.pdf`}
                           className="flex items-center text-sm text-teal-600 hover:text-teal-800"
                           onClick={() => handleDownload(application)}
                         >
-                          {({ loading,}) => 
+                          {({ loading }) => 
                             loading ? (
                               <span>Loading document...</span>
                             ) : (
