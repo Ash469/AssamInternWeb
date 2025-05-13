@@ -23,6 +23,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
+    "firebase-admin": "^13.4.0",
     "framer-motion": "^12.6.3",
     "gsap": "^3.12.7",
     "html2canvas": "^1.4.1",

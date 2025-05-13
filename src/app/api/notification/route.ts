@@ -1,139 +1,107 @@
-import { NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Notification from "@/models/Notification";
+import { NextResponse } from 'next/server';
+import { connectDB } from '@/lib/db';
+import Notification from '@/models/Notification'; 
+import { messaging } from '@/lib/firebase-admin';
 
-// Helper function to add CORS headers
-function corsHeaders(response: NextResponse) {
-  response.headers.set('Access-Control-Allow-Origin', '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  return response;
-}
-
-// Handle OPTIONS requests for CORS preflight
-export async function OPTIONS() {
-  return corsHeaders(
-    new NextResponse(null, {
-      status: 200,
-    })
-  );
-}
+// Define an interface for your Notification document if not already defined in models/Notification
+// interface INotification {
+//   _id: string;
+//   title: string;
+//   content: string;
+//   createdAt: Date;
+//   updatedAt: Date;
+// }
 
 export async function POST(request: Request) {
   try {
     await connectDB();
-    
-    const body = await request.json();
-    const { title, content } = body;
-    
-    // Validate request body
+    const { title, content } = await request.json();
+
     if (!title || !content) {
-      return corsHeaders(
-        NextResponse.json(
-          { error: "Title and content are required" },
-          { status: 400 }
-        )
-      );
+      return NextResponse.json({ error: 'Title and content are required' }, { status: 400 });
     }
-    
-    // Create new notification
-    const notification = await Notification.create({
-      title,
-      content,
-    });
-    
-    return corsHeaders(
-      NextResponse.json(
-        { message: "Notification created successfully", notification },
-        { status: 201 }
-      )
-    );
-  } catch (error: unknown) {
-    console.error("Error creating notification:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to create notification";
-    return corsHeaders(
-      NextResponse.json(
-        { error: errorMessage },
-        { status: 500 }
-      )
-    );
+
+    const newNotification = new Notification({ title, content });
+    const savedNotification = await newNotification.save();
+
+    // Send FCM push notification
+    if (messaging) {
+      const fcmTopic = process.env.FCM_DEFAULT_TOPIC || 'all_users';
+      const messagePayload = {
+        notification: {
+          title: title,
+          body: content,
+        },
+        data: { // Optional: send additional data to your app
+          notificationId: String(savedNotification._id),
+          // Add any other custom data your app might need
+        },
+        topic: fcmTopic,
+      };
+
+      console.log(`Attempting to send FCM message to topic: ${fcmTopic}`, messagePayload);
+
+      try {
+        const response = await messaging.send(messagePayload);
+        console.log('Successfully sent FCM message:', response);
+      } catch (fcmError) {
+        console.error('Error sending FCM message:', fcmError);
+        // Log detailed error information if available
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const errorDetails = fcmError as any;
+        if (errorDetails.errorInfo) {
+          console.error('FCM Error Info:', errorDetails.errorInfo);
+        }
+        if (errorDetails.results) {
+            console.error('FCM Send Results (if partial failure):', errorDetails.results);
+        }
+        // Even if FCM fails, we might still want to return success for DB operation
+        // Or, you could return a specific status indicating partial success.
+      }
+    } else {
+      console.warn('Firebase Messaging service is not available. Skipping push notification.');
+    }
+
+    return NextResponse.json({ message: 'Notification created successfully', notification: savedNotification }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating notification:', error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return NextResponse.json({ error: (error as any).message || 'Failed to create notification' }, { status: 500 });
   }
 }
 
-// GET route to fetch notifications
 export async function GET() {
   try {
     await connectDB();
-    
-    const notifications = await Notification.find({})
-      .sort({ createdAt: -1 });
-    
-    return corsHeaders(
-      NextResponse.json(notifications)
-    );
-    
-  } catch (error: unknown) {
-    console.error("Error fetching notifications:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to fetch notifications";
-    return corsHeaders(
-      NextResponse.json(
-        { error: errorMessage },
-        { status: 500 }
-      )
-    );
+    const notifications = await Notification.find().sort({ createdAt: -1 });
+    return NextResponse.json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return NextResponse.json({ error: (error as any).message || 'Failed to fetch notifications' }, { status: 500 });
   }
 }
 
-// DELETE route to delete a notification by ID
 export async function DELETE(request: Request) {
   try {
     await connectDB();
-    
-    // Get the notification ID from the request URL search params
-    const url = new URL(request.url);
-    const id = url.searchParams.get('id');
-    
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
     if (!id) {
-      return corsHeaders(
-        NextResponse.json(
-          { error: "Notification ID is required" },
-          { status: 400 }
-        )
-      );
+      return NextResponse.json({ error: 'Notification ID is required' }, { status: 400 });
     }
 
-    // Check if notification exists and delete it in one operation
     const deletedNotification = await Notification.findByIdAndDelete(id);
-    
+
     if (!deletedNotification) {
-      return corsHeaders(
-        NextResponse.json(
-          { error: "Notification not found" },
-          { status: 404 }
-        )
-      );
+      return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
     }
 
-    return corsHeaders(
-      NextResponse.json(
-        { 
-          message: "Notification deleted successfully",
-          deletedNotification: {
-            _id: deletedNotification._id,
-            title: deletedNotification.title
-          }
-        },
-        { status: 200 }
-      )
-    );
-  } catch (error: unknown) {
-    console.error("Error deleting notification:", error);
-    const errorMessage = error instanceof Error ? error.message : "Failed to delete notification";
-    return corsHeaders(
-      NextResponse.json(
-        { error: errorMessage },
-        { status: 500 }
-      )
-    );
+    return NextResponse.json({ message: 'Notification deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return NextResponse.json({ error: (error as any).message || 'Failed to delete notification' }, { status: 500 });
   }
 }

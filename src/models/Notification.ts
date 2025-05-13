@@ -1,33 +1,31 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Document, models, Model } from 'mongoose';
 
-interface INotification {
+export interface INotification extends Document {
   title: string;
   content: string;
   createdAt: Date;
+  updatedAt: Date;
 }
 
-const notificationSchema = new Schema<INotification>(
+const NotificationSchema: Schema<INotification> = new Schema(
   {
     title: {
       type: String,
-      required: [true, "Title is required"],
+      required: [true, 'Title is required'],
       trim: true,
     },
     content: {
       type: String,
-      required: [true, "Content is required"],
+      required: [true, 'Content is required'],
       trim: true,
-    },
-    createdAt: {
-      type: Date,
-      default: Date.now,
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // Automatically adds createdAt and updatedAt fields
   }
 );
 
-const Notification = mongoose.models.Notification || mongoose.model<INotification>("Notification", notificationSchema);
+// Check if the model already exists before defining it
+const Notification: Model<INotification> = models.Notification || mongoose.model<INotification>('Notification', NotificationSchema);
 
 export default Notification;
