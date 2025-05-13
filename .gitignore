@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Firebase
+src/config/firebase-service-account.json
+src/assamapp-35a89-firebase-adminsdk-fbsvc-558d2b07ee.json
