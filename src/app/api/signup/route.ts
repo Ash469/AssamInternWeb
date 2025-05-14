@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
     if (!firstName?.trim()) validationErrors.push('First name is required');
     if (!lastName?.trim()) validationErrors.push('Last name is required');
     if (!contactNumber?.trim()) validationErrors.push('Contact number is required');
+    if (!/^\d{10}$/.test(contactNumber)) validationErrors.push('Contact number must be a valid 10-digit number');
     if (!email?.trim()) validationErrors.push('Email is required');
     if (!userId?.trim()) validationErrors.push('User ID is required');
     if (!password?.trim()) validationErrors.push('Password is required');
@@ -74,15 +75,22 @@ export async function POST(req: NextRequest) {
 
     // Check for existing user with detailed logging
     const existingUser = await User.findOne({
-      $or: [{ email }, { userId }],
+      $or: [{ email }, { userId }, { contactNumber }],
     });
     
     if (existingUser) {
       console.log('Existing user found:', existingUser.email);
+      let field = 'userId';
+      if (existingUser.email === email) {
+        field = 'email';
+      } else if (existingUser.contactNumber === contactNumber) {
+        field = 'contactNumber';
+      }
+      
       return new NextResponse(
         JSON.stringify({ 
-          error: "User with this email or userId already exists.",
-          field: existingUser.email === email ? 'email' : 'userId'
+          error: `User with this ${field === 'contactNumber' ? 'phone number' : field} already exists.`,
+          field: field
         }), 
         { 
           status: 400,

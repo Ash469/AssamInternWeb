@@ -30,6 +30,10 @@ export default function UserSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!/^\d{10}$/.test(formData.contactNumber)) {
+      setError('Contact number must be a valid 10-digit number')
+      return
+    }
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match')
       return
@@ -37,8 +41,6 @@ export default function UserSignup() {
 
     setIsLoading(true)
     setError('')
-
-  //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000/api';
 
     try {
       const response = await fetch('/api/signup', {
@@ -55,7 +57,20 @@ export default function UserSignup() {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || 'Signup failed')
+        if (data.field) {
+          // Handle specific field errors
+          if (data.field === 'email') {
+            throw new Error('A user with this email already exists');
+          } else if (data.field === 'userId') {
+            throw new Error('This User ID is already taken');
+          } else if (data.field === 'contactNumber') {
+            throw new Error('This phone number is already registered');
+          } else {
+            throw new Error(data.error || 'Signup failed');
+          }
+        } else {
+          throw new Error(data.error || 'Signup failed');
+        }
       }
 
       setIsSuccess(true)
@@ -97,7 +112,6 @@ export default function UserSignup() {
                     { label: 'Middle name', name: 'middleName' },
                     { label: 'Last name', name: 'lastName', required: true },
                     { label: 'User ID', name: 'userId', required: true, placeholder: 'Eg: Rajesh2025A' },
-                    { label: 'Age', name: 'age', required: true, type: 'number' },
                     { label: 'Password', name: 'password', required: true, type: 'password' }
                   ].map(({ label, name, required, placeholder, type = 'text' }) => (
                     <div key={name}>
@@ -170,6 +184,21 @@ export default function UserSignup() {
 
                   <div>
                     <label className="block font-semibold text-black">
+                      Age <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="age"
+                      value={formData.age}
+                      onChange={handleChange}
+                      placeholder="Enter your age"
+                      required
+                      className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-teal-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-semibold text-black">
                       Confirm Password <span className="text-red-600">*</span>
                     </label>
                     <input
@@ -178,7 +207,7 @@ export default function UserSignup() {
                       value={formData.confirmPassword}
                       onChange={handleChange}
                       required
-                      placeholder="Enter your password again"
+                      placeholder="Confirm your password"
                       className="w-full px-4 py-2 border rounded-md focus:ring-2 focus:ring-teal-500"
                     />
                   </div>
