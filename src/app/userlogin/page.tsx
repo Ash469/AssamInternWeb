@@ -4,6 +4,21 @@ import { FaUser, FaSignInAlt } from 'react-icons/fa';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import jwt_decode from 'jwt-decode';
+
+interface UserProfile {
+  _id?: string;
+  userId?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  email?: string;
+  contactNumber?: string;
+  gender?: string;
+  age?: number;
+  createdAt?: string;
+  verified?: boolean;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -55,40 +70,71 @@ export default function LoginPage() {
         console.log("Login successful:", data);
         localStorage.setItem('token', data.token);
         
-        // Also save the user ID to localStorage
-        if (data.userId) {
-          localStorage.setItem('userId', data.userId);
-        } else if (data.user && data.user._id) {
-          localStorage.setItem('userId', data.user._id);
-        } else {
-          // Try to extract user ID from token
-          try {
-            const base64Url = data.token.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
-              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-            
-            const decoded = JSON.parse(jsonPayload);
-            if (decoded.id || decoded._id || decoded.userId || decoded.sub) {
-              localStorage.setItem('userId', decoded.id || decoded._id || decoded.userId || decoded.sub);
-            }
-          } catch (e) {
-            console.error("Error extracting user ID from token:", e);
-          }
+        // Extract userId from JWT token exactly like profile page does
+        let userId = null;
+        try {
+          const decoded = jwt_decode(data.token) as { 
+            id?: string; 
+            userId?: string; 
+            _id?: string; 
+            sub?: string 
+          };
+          userId = decoded.id || decoded.userId || decoded._id || decoded.sub;
+          console.log("Extracted userId from token:", userId);
+        } catch (decodeErr) {
+          console.error('Error decoding token:', decodeErr);
         }
         
-        // Add a small delay before navigation to ensure localStorage is updated
-        setTimeout(() => {
-          console.log("Navigating to dashboard...");
-          router.push('/userdashboard');
-        }, 100);
-        
-        // Force a hard navigation if the router.push doesn't work
-        setTimeout(() => {
-          console.log("Fallback navigation");
-          window.location.href = '/userdashboard';
-        }, 500);
+        // Use the same fetch approach as profile page
+        return fetch('/api/getnewsignup')
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Failed to fetch user profile');
+            }
+            return response.json();
+          })
+          .then(userData => {
+            if (userData.users && userData.users.length > 0) {
+              let userProfile = null;
+              
+              // Use exact same logic as profile page
+              if (userId) {
+                const loggedInUser = userData.users.find((user: UserProfile) => 
+                  user._id === userId || user.userId === userId
+                );
+                
+                if (loggedInUser) {
+                  userProfile = loggedInUser;
+                  console.log("Found logged in user:", loggedInUser);
+                } else {
+                  userProfile = userData.users[0];
+                  console.warn('Logged in user not found in user list, showing first user');
+                }
+              } else {
+                userProfile = userData.users[0];
+              }
+              
+              // Store the exact same user profile that will be displayed in profile page
+              if (userProfile) {
+                localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                localStorage.setItem('userId', userProfile.userId || userProfile._id || '');
+              }
+            } else {
+              throw new Error('No user data found');
+            }
+            
+            // Add a small delay before navigation to ensure localStorage is updated
+            setTimeout(() => {
+              console.log("Navigating to dashboard...");
+              router.push('/userdashboard');
+            }, 100);
+            
+            // Force a hard navigation if the router.push doesn't work
+            setTimeout(() => {
+              console.log("Fallback navigation");
+              window.location.href = '/userdashboard';
+            }, 500);
+          });
       })
       .catch(err => {
         console.error("Login error:", err);

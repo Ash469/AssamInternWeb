@@ -96,7 +96,8 @@ export default function ProfilePage() {
   }, []);
   
   const handleLogout = () => {
-    localStorage.removeItem('token')
+    // Clear all data from localStorage, not just the token
+    localStorage.clear()
     sessionStorage.clear()
     router.push('/')
   }

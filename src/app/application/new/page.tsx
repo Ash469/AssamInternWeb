@@ -6,6 +6,7 @@ import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import { FaFileAlt, FaCloudUploadAlt, FaChevronLeft } from 'react-icons/fa';
 import Footer from '@/app/components/footer';
+import jwt_decode from 'jwt-decode';
 
 const NewApplicationPage = () => {
   const [form, setForm] = useState({
@@ -29,6 +30,7 @@ const NewApplicationPage = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // Add success popup state
   const router = useRouter();
 
   useEffect(() => {
@@ -39,54 +41,50 @@ const NewApplicationPage = () => {
       router.push('/userlogin');
       return;
     }
-
-    // Extract user ID from localStorage first (most reliable method)
-    const storedUserId = localStorage.getItem('userId');
-    if (storedUserId) {
-      console.log("Using userId from localStorage:", storedUserId);
-      setUserId(storedUserId);
-      return;
-    }
     
-    // If not in localStorage, try to extract from token
     try {
-      // First try to parse the JWT token
-      const tokenParts = token.split('.');
-      if (tokenParts.length === 3) {
-        const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-          atob(base64)
-            .split('')
-            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-            .join('')
-        );
-        const decoded = JSON.parse(jsonPayload);
-        const extractedUserId = decoded.id || decoded.userId || decoded._id || decoded.sub;
-        if (extractedUserId) {
-          console.log("Extracted userId from JWT:", extractedUserId);
-          setUserId(extractedUserId);
-          // Also save to localStorage for future use
-          localStorage.setItem('userId', extractedUserId);
-          return;
+      setLoading(true);
+      
+      // Get userId directly from localStorage instead of decoding the token
+      const storedUserId = localStorage.getItem('userId');
+      
+      if (storedUserId) {
+        console.log("Using userId from localStorage:", storedUserId);
+        setUserId(storedUserId);
+      } else {
+        // Fallback to token decoding if userId is not in localStorage
+        try {
+          const decoded = jwt_decode(token) as { 
+            id?: string; 
+            userId?: string; 
+            _id?: string; 
+            sub?: string 
+          };
+          
+          const extractedUserId = decoded.id || decoded.userId || decoded._id || decoded.sub;
+          
+          if (extractedUserId) {
+            console.log("Fallback: Using userId from token:", extractedUserId);
+            setUserId(extractedUserId);
+            // Store it for future use
+            localStorage.setItem('userId', extractedUserId);
+          } else {
+            console.error('No valid userId found in token');
+            setMessage("Invalid user session. Please log in again.");
+          }
+        } catch (decodeErr) {
+          console.error('Error decoding token:', decodeErr);
+          setMessage("Session error. Please log in again.");
         }
       }
-      
-      // If we still don't have a userId, generate a temporary one
-      const tempUserId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
-      console.log("Using generated temporary userId:", tempUserId);
-      setUserId(tempUserId);
-      localStorage.setItem('userId', tempUserId);
-      
-    } catch (error) {
-      console.error("Error extracting user ID:", error);
-      // Generate a fallback userId if extraction fails
-      const fallbackId = `user-${Date.now()}`;
-      console.log("Using fallback userId:", fallbackId);
-      setUserId(fallbackId);
-      localStorage.setItem('userId', fallbackId);
+    } catch (err) {
+      console.error('Error getting user info:', err);
+      setMessage("Failed to retrieve user information. Please try again later.");
+    } finally {
+      setLoading(false);
     }
   }, [router]);
-
+  
   //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000/api';
 
   // Districts in Assam
@@ -108,7 +106,24 @@ const NewApplicationPage = () => {
   const villageWards = ['Village', 'Ward'];
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    // Add validation for age field (maximum 2 digits)
+    if (name === 'age') {
+      const ageValue = value.replace(/[^0-9]/g, '').slice(0, 2); // Allow only numbers and limit to 2 digits
+      setForm({ ...form, [name]: ageValue });
+      return;
+    }
+    
+    // Add validation for contact number (exactly 10 digits)
+    if (name === 'contactNumber') {
+      const contactValue = value.replace(/[^0-9]/g, '').slice(0, 10); // Allow only numbers and limit to 10 digits
+      setForm({ ...form, [name]: contactValue });
+      return;
+    }
+    
+    // Default handling for other fields
+    setForm({ ...form, [name]: value });
   };
 
   // Handle file selection
@@ -172,6 +187,13 @@ const NewApplicationPage = () => {
     setMessage('');
     setSubmitSuccess(false);
 
+    // Validate contact number has exactly 10 digits
+    if (form.contactNumber.length !== 10) {
+      setMessage('Contact number must be exactly 10 digits');
+      setLoading(false);
+      return;
+    }
+
     if (!userId) {
       setMessage("User ID not available. Please log in again.");
       setLoading(false);
@@ -195,7 +217,7 @@ const NewApplicationPage = () => {
         ...form,
         documentUrl,
         age: parseInt(form.age, 10) || 0,
-        createdBy: userId.toString() // Ensure it's a string and properly set
+        createdBy: userId // Use userId directly without toString() conversion
       };
 
       // Log the payload for debugging
@@ -251,6 +273,14 @@ const NewApplicationPage = () => {
         });
         setSelectedFile(null);
         setUploadStatus('');
+        
+        // Show success popup and redirect after delay
+        setShowSuccessPopup(true);
+        
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          router.push('/userdashboard');
+        }, 3000);
       } else {
         throw new Error(data?.error || `Request failed with status ${res.status}`);
       }
@@ -266,6 +296,24 @@ const NewApplicationPage = () => {
   return (
     <div className="min-h-screen bg-white">
       <NavBar />
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl max-w-md w-full animate-fade-in-up">
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Application Submitted Successfully!</h3>
+              <p className="text-gray-600 mb-6">Your application has been received and is now being processed.</p>
+              <p className="text-gray-500 text-sm">Redirecting to dashboard in 3 seconds...</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section */}
       <section className="bg-teal-800 text-white py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between relative">
@@ -324,11 +372,13 @@ const NewApplicationPage = () => {
                   <label htmlFor="age" className="block text-gray-700 mb-1 font-medium">Age <span className="text-red-500">*</span></label>
                   <input 
                     id="age"
-                    type="number" 
+                    type="text" 
                     name="age" 
-                    placeholder="Enter your age" 
+                    placeholder="Enter your age (max 2 digits)" 
                     value={form.age} 
-                    onChange={handleChange} 
+                    onChange={handleChange}
+                    maxLength={2}
+                    pattern="\d{1,2}"
                     className="w-full py-2 border-b-2 border-teal-500 bg-transparent focus:outline-none focus:border-teal-700 transition-colors" 
                     required 
                   />
@@ -340,12 +390,17 @@ const NewApplicationPage = () => {
                     id="contactNumber"
                     type="text" 
                     name="contactNumber" 
-                    placeholder="Enter your contact number" 
+                    placeholder="Enter your 10-digit contact number" 
                     value={form.contactNumber} 
-                    onChange={handleChange} 
+                    onChange={handleChange}
+                    maxLength={10}
+                    pattern="\d{10}"
                     className="w-full py-2 border-b-2 border-teal-500 bg-transparent focus:outline-none focus:border-teal-700 transition-colors" 
                     required 
                   />
+                  {form.contactNumber && form.contactNumber.length !== 10 && (
+                    <p className="text-xs text-red-500 mt-1">Contact number must be exactly 10 digits</p>
+                  )}
                 </div>
                 
                 <div className="form-group">
