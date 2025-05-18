@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import NavBar from '../components/nav_bar';
 import { FaChevronDown, FaChevronUp} from 'react-icons/fa';
 import Footer from '../components/footer';
@@ -8,6 +9,16 @@ import Footer from '../components/footer';
 export default function FAQPage() {
   // State to track which FAQ is open
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login page if no token exists
+      router.push('/userlogin');
+    }
+  }, [router]);
 
   // Toggle FAQ open/close
   const toggleFaq = (index: number) => {

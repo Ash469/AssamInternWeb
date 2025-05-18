@@ -27,6 +27,14 @@ export default function ProfilePage() {
   const router = useRouter()
 
   useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token')
+    if (!token) {
+      // Redirect to login page if no token exists
+      router.push('/userlogin')
+      return
+    }
+    
     const fetchUserProfile = async () => {
       try {
         setLoading(true)

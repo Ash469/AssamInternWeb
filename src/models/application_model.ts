@@ -30,7 +30,7 @@ interface IApplication extends Document {
   remarks?: string;
   documentUrl?: string;
   status: StatusType;
-
+  createdBy: string; // Added field to track who created the application
 }
 
 // Mongoose Schema
@@ -60,7 +60,7 @@ const ApplicationSchema = new Schema<IApplication>(
       default: "",
     },
     status: { type: String, enum: STATUS_OPTIONS, default: "Pending" },
-    
+    createdBy: { type: String, required: true }, // Store the userId who created this application
   },
   { timestamps: true }
 );

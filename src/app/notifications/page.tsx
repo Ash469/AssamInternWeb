@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import NavBar from '../components/nav_bar';
 import Footer from '../components/footer';
 
@@ -55,6 +56,7 @@ export default function NotificationsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
 
   const handleNotificationClick = (notification: NotificationItem) => {
     setSelectedNotification(notification);
@@ -65,6 +67,15 @@ export default function NotificationsPage() {
     setShowModal(false);
     setSelectedNotification(null);
   };
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login page if no token exists
+      router.push('/userlogin');
+    }
+  }, [router]);
 
   useEffect(() => {
     const fetchNotifications = async () => {

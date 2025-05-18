@@ -55,6 +55,29 @@ export default function LoginPage() {
         console.log("Login successful:", data);
         localStorage.setItem('token', data.token);
         
+        // Also save the user ID to localStorage
+        if (data.userId) {
+          localStorage.setItem('userId', data.userId);
+        } else if (data.user && data.user._id) {
+          localStorage.setItem('userId', data.user._id);
+        } else {
+          // Try to extract user ID from token
+          try {
+            const base64Url = data.token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => {
+              return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            
+            const decoded = JSON.parse(jsonPayload);
+            if (decoded.id || decoded._id || decoded.userId || decoded.sub) {
+              localStorage.setItem('userId', decoded.id || decoded._id || decoded.userId || decoded.sub);
+            }
+          } catch (e) {
+            console.error("Error extracting user ID from token:", e);
+          }
+        }
+        
         // Add a small delay before navigation to ensure localStorage is updated
         setTimeout(() => {
           console.log("Navigating to dashboard...");
@@ -177,14 +200,14 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-6 text-center space-y-3">
-              <div>
+              {/* <div>
                 <Link 
                   href="/forgot-password"
                   className="text-teal-600 hover:text-teal-800 transition-colors"
                 >
                   Forgot Password?
                 </Link>
-              </div>
+              </div> */}
               <div>
                 <Link 
                   href="/"

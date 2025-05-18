@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import { FaFileAlt, FaCloudUploadAlt, FaChevronLeft } from 'react-icons/fa';
@@ -23,10 +24,68 @@ const NewApplicationPage = () => {
   const [uploadStatus, setUploadStatus] = useState<string>('');
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [userId, setUserId] = useState<string | null>(null); // Added userId state
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [submitSuccess, setSubmitSuccess] = useState(false); // Track successful submissions
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login page if no token exists
+      router.push('/userlogin');
+      return;
+    }
+
+    // Extract user ID from localStorage first (most reliable method)
+    const storedUserId = localStorage.getItem('userId');
+    if (storedUserId) {
+      console.log("Using userId from localStorage:", storedUserId);
+      setUserId(storedUserId);
+      return;
+    }
+    
+    // If not in localStorage, try to extract from token
+    try {
+      // First try to parse the JWT token
+      const tokenParts = token.split('.');
+      if (tokenParts.length === 3) {
+        const base64 = tokenParts[1].replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+        const decoded = JSON.parse(jsonPayload);
+        const extractedUserId = decoded.id || decoded.userId || decoded._id || decoded.sub;
+        if (extractedUserId) {
+          console.log("Extracted userId from JWT:", extractedUserId);
+          setUserId(extractedUserId);
+          // Also save to localStorage for future use
+          localStorage.setItem('userId', extractedUserId);
+          return;
+        }
+      }
+      
+      // If we still don't have a userId, generate a temporary one
+      const tempUserId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 10)}`;
+      console.log("Using generated temporary userId:", tempUserId);
+      setUserId(tempUserId);
+      localStorage.setItem('userId', tempUserId);
+      
+    } catch (error) {
+      console.error("Error extracting user ID:", error);
+      // Generate a fallback userId if extraction fails
+      const fallbackId = `user-${Date.now()}`;
+      console.log("Using fallback userId:", fallbackId);
+      setUserId(fallbackId);
+      localStorage.setItem('userId', fallbackId);
+    }
+  }, [router]);
 
   //const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:10000/api';
 
@@ -113,6 +172,12 @@ const NewApplicationPage = () => {
     setMessage('');
     setSubmitSuccess(false);
 
+    if (!userId) {
+      setMessage("User ID not available. Please log in again.");
+      setLoading(false);
+      return;
+    }
+
     try {
       let documentUrl = form.documentUrl;
       if (selectedFile) {
@@ -129,7 +194,8 @@ const NewApplicationPage = () => {
       const payload = {
         ...form,
         documentUrl,
-        age: parseInt(form.age, 10) || 0
+        age: parseInt(form.age, 10) || 0,
+        createdBy: userId.toString() // Ensure it's a string and properly set
       };
 
       // Log the payload for debugging
@@ -154,6 +220,11 @@ const NewApplicationPage = () => {
       if (contentType && contentType.includes('application/json')) {
         data = await res.json();
         console.log('Response data:', data);
+        
+        // Show detailed error if available
+        if (!res.ok && data.error) {
+          throw new Error(data.error + (data.missingFields ? ': ' + data.missingFields.join(', ') : ''));
+        }
       } else {
         // Handle non-JSON responses
         const text = await res.text();

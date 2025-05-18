@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Notification from '@/models/Notification'; 
-import { messaging } from '@/lib/firebase-admin';
+import  { messaging } from '@/lib/firebase-admin';
 
 // Define an interface for your Notification document if not already defined in models/Notification
 // interface INotification {
@@ -25,41 +25,30 @@ export async function POST(request: Request) {
     const savedNotification = await newNotification.save();
 
     // Send FCM push notification
-    if (messaging) {
-      const fcmTopic = process.env.FCM_DEFAULT_TOPIC || 'all_users';
-      const messagePayload = {
-        notification: {
-          title: title,
-          body: content,
-        },
-        data: { // Optional: send additional data to your app
-          notificationId: String(savedNotification._id),
-          // Add any other custom data your app might need
-        },
-        topic: fcmTopic,
-      };
+    try {
+      // Check if messaging is properly initialized
+      if (messaging) {
+        const fcmTopic = process.env.FCM_DEFAULT_TOPIC || 'all_users';
+        const messagePayload = {
+          notification: {
+            title: title,
+            body: content,
+          },
+          data: {
+            notificationId: String(savedNotification._id),
+          },
+          topic: fcmTopic,
+        };
 
-      console.log(`Attempting to send FCM message to topic: ${fcmTopic}`, messagePayload);
-
-      try {
+        console.log(`Sending FCM message to topic: ${fcmTopic}`);
         const response = await messaging.send(messagePayload);
         console.log('Successfully sent FCM message:', response);
-      } catch (fcmError) {
-        console.error('Error sending FCM message:', fcmError);
-        // Log detailed error information if available
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const errorDetails = fcmError as any;
-        if (errorDetails.errorInfo) {
-          console.error('FCM Error Info:', errorDetails.errorInfo);
-        }
-        if (errorDetails.results) {
-            console.error('FCM Send Results (if partial failure):', errorDetails.results);
-        }
-        // Even if FCM fails, we might still want to return success for DB operation
-        // Or, you could return a specific status indicating partial success.
+      } else {
+        console.warn('Firebase Messaging service is not available. Check Firebase Admin SDK initialization.');
       }
-    } else {
-      console.warn('Firebase Messaging service is not available. Skipping push notification.');
+    } catch (fcmError) {
+      console.error('Error sending FCM message:', fcmError);
+      // Log error details but continue with response
     }
 
     return NextResponse.json({ message: 'Notification created successfully', notification: savedNotification }, { status: 201 });

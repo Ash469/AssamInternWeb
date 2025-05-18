@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import { FaFilter, FaDownload, FaEye, FaChevronLeft, FaFileAlt } from 'react-icons/fa';
@@ -223,18 +224,57 @@ export default function ApplicationStatus() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isPdfLoading, setIsPdfLoading] = useState(false);
-  
+  const [userId, setUserId] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login page if no token exists
+      router.push('/userlogin');
+      return;
+    }
+    
+    // Extract user ID from token or get it from local storage
+    // This is a placeholder - implement according to your auth system
+    try {
+      // Option 1: If you store user ID in localStorage
+      const storedUserId = localStorage.getItem('userId');
+      if (storedUserId) {
+        setUserId(storedUserId);
+      } else {
+        // Option 2: Extract from JWT token (if that's what you're using)
+        // This is a simplified example - in reality you'd use a proper JWT decoder
+        const tokenParts = token.split('.');
+        if (tokenParts.length === 3) {
+          const payload = JSON.parse(atob(tokenParts[1]));
+          setUserId(payload.userId || payload.sub || payload.id);
+        }
+      }
+    } catch (error) {
+      console.error("Error extracting user ID:", error);
+      router.push('/userlogin');
+    }
+  }, [router]);
+
   useEffect(() => {
     const fetchApplications = async () => {
+      if (!userId) return; // Don't fetch if we don't have the user ID
+      
       try {
-        const response = await fetch('/api/applications');
+        // Update the API endpoint to include the user ID as a query parameter
+        const response = await fetch(`/api/applications?userId=${userId}`);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
         const data = await response.json();
         const sortedApplications = (data.data || []).sort((a: Application, b: Application) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
+        
         setApplications(sortedApplications);
         setFilteredApps(sortedApplications);
       } catch (err) {
@@ -245,7 +285,7 @@ export default function ApplicationStatus() {
     };
 
     fetchApplications();
-  }, []);
+  }, [userId]); // Depend on userId so we fetch when it's available
 
   useEffect(() => {
     let result = [...applications];

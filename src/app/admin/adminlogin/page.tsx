@@ -2,7 +2,7 @@
 
 import { FaUserShield, FaSignInAlt } from 'react-icons/fa'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 
 export default function AdminLogin() {
@@ -13,6 +13,15 @@ export default function AdminLogin() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const userData = localStorage.getItem('userData');
+    if (userData) {
+      // User is already logged in, redirect to dashboard
+      router.push('/admin/dashboard');
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -25,9 +34,6 @@ export default function AdminLogin() {
     e.preventDefault()
     setIsLoading(true)
     setError('')
-
-  //  const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:10000/api';
-    // const apiUrl = 'http://localhost:10000';
 
     try {
       const response = await fetch('/api/adminlogin', {
@@ -42,12 +48,21 @@ export default function AdminLogin() {
         throw new Error('Login failed')
       }
 
-      // Assuming successful login
+      // // Get the response data
+      // const data = await response.json();
+      
+      // Save authentication state in localStorage
+      const userData = {
+        isAuthenticated: true,
+        firstName: 'Admin', // You can update this with actual data from response
+        username: formData.username
+      };
+      
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Redirect to dashboard after successful login
       router.push('/admin/dashboard')
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      setError('Invalid credentials. Please try again.')
-    } finally {
+    }finally {
       setIsLoading(false)
     }
   }

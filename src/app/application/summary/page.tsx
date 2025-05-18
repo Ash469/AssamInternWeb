@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import axios from "axios";
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
@@ -20,6 +21,17 @@ export default function SummaryPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login page if no token exists
+      router.push('/userlogin');
+      return;
+    }
+  }, [router]);
 
   useEffect(() => {
     fetchStats();
@@ -249,7 +261,7 @@ export default function SummaryPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 mt-6">
+        {/* <div className="grid grid-cols-1 gap-6 mt-6">
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <h2 className="text-xl font-bold text-teal-700 mb-4">Users Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -267,7 +279,7 @@ export default function SummaryPage() {
               />
             </div>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );
