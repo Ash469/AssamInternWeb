@@ -1,16 +1,6 @@
 import { NextResponse } from 'next/server';
 import { connectDB } from '@/lib/db';
 import Notification from '@/models/Notification'; 
-import  { messaging } from '@/lib/firebase-admin';
-
-// Define an interface for your Notification document if not already defined in models/Notification
-// interface INotification {
-//   _id: string;
-//   title: string;
-//   content: string;
-//   createdAt: Date;
-//   updatedAt: Date;
-// }
 
 export async function POST(request: Request) {
   try {
@@ -23,33 +13,6 @@ export async function POST(request: Request) {
 
     const newNotification = new Notification({ title, content });
     const savedNotification = await newNotification.save();
-
-    // Send FCM push notification
-    try {
-      // Check if messaging is properly initialized
-      if (messaging) {
-        const fcmTopic = process.env.FCM_DEFAULT_TOPIC || 'all_users';
-        const messagePayload = {
-          notification: {
-            title: title,
-            body: content,
-          },
-          data: {
-            notificationId: String(savedNotification._id),
-          },
-          topic: fcmTopic,
-        };
-
-        console.log(`Sending FCM message to topic: ${fcmTopic}`);
-        const response = await messaging.send(messagePayload);
-        console.log('Successfully sent FCM message:', response);
-      } else {
-        console.warn('Firebase Messaging service is not available. Check Firebase Admin SDK initialization.');
-      }
-    } catch (fcmError) {
-      console.error('Error sending FCM message:', fcmError);
-      // Log error details but continue with response
-    }
 
     return NextResponse.json({ message: 'Notification created successfully', notification: savedNotification }, { status: 201 });
   } catch (error) {

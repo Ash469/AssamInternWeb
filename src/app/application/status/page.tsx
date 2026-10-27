@@ -86,7 +86,6 @@ export default function ApplicationStatusPage() {
       if (userObj.id) params.append('userId', userObj.id);
       if (userObj.email) params.append('email', userObj.email);
       if (userObj.contactNumber) params.append('contact', userObj.contactNumber);
-      if (userObj.fullName) params.append('name', userObj.fullName);
 
       // If no token or identifiers, fall back to fetching all or prompt login
       const url = params.toString() ? `/api/applications?${params.toString()}` : '/api/applications';

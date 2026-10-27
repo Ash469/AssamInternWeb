@@ -35,10 +35,9 @@ export const GET = async (req: NextRequest) => {
   const userId = url.searchParams.get('userId');
   const email = url.searchParams.get('email');
   const contact = url.searchParams.get('contact');
-  const name = url.searchParams.get('name');
 
   try {
-    if (userId || email || contact || name) {
+    if (userId || email || contact) {
       // If user identifier provided, get applications by this user
       return await getApplicationsByUserId(req);
     } else {

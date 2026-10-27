@@ -1,4 +1,4 @@
-import admin from '../lib/firebase-admin';
+// Firebase Cloud Messaging is currently disabled from the main application flow.
 
 interface PushNotificationData {
   title: string;
@@ -7,50 +7,17 @@ interface PushNotificationData {
 }
 
 export const sendPushNotification = async (
-  topic: string,
-  title: string,
-  body: string,
-  data?: PushNotificationData
+  _topic: string,
+  _title: string,
+  _body: string,
+  _data?: PushNotificationData
 ): Promise<boolean> => {
-  try {
-    if (!admin.apps.length) {
-      console.error("Firebase Admin SDK not initialized");
-      return false;
-    }
-
-    // Message payload
-    const message = {
-      notification: {
-        title,
-        body,
-      },
-      data: data || {},
-      topic, // Send to a specific topic (all users subscribed to this topic will get the notification)
-    };
-
-    // Send the message
-    const response = await admin.messaging().send(message);
-    console.log('Push notification sent successfully:', response);
-    return true;
-  } catch (error) {
-    console.error('Error sending push notification:', error);
-    return false;
-  }
+  // Push notifications disabled
+  return false;
 };
 
-export const subscribeToTopic = async (tokens: string[], topic: string): Promise<boolean> => {
-  try {
-    if (!admin.apps.length) {
-      console.error("Firebase Admin SDK not initialized");
-      return false;
-    }
-
-    // Subscribe the devices corresponding to the registration tokens to the topic
-    const response = await admin.messaging().subscribeToTopic(tokens, topic);
-    console.log('Successfully subscribed to topic:', response);
-    return true;
-  } catch (error) {
-    console.error('Error subscribing to topic:', error);
-    return false;
-  }
+export const subscribeToTopic = async (_tokens: string[], _topic: string): Promise<boolean> => {
+  // Push notifications disabled
+  return false;
 };
+

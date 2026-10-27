@@ -64,9 +64,9 @@ export const createApplication = async (req: NextRequest): Promise<NextResponse>
     if (missingFields.length > 0) {
       console.log("Missing required fields:", missingFields);
       return NextResponse.json(
-        { 
-          error: "Missing required fields", 
-          missingFields: missingFields 
+        {
+          error: "Missing required fields",
+          missingFields: missingFields
         },
         { status: 400, headers: corsHeaders }
       );
@@ -191,37 +191,51 @@ export const getApplicationsByUserId = async (req: NextRequest): Promise<NextRes
     const userId = url.searchParams.get('userId');
     const email = url.searchParams.get('email');
     const contact = url.searchParams.get('contact');
-    const name = url.searchParams.get('name');
 
-    const orConditions: any[] = [];
-
+    // Citizen unique lookup criteria
+    const lookupConditions: any[] = [];
     if (userId && userId !== 'undefined' && userId !== 'null') {
-      orConditions.push({ createdBy: userId });
-      orConditions.push({ createdBy: userId.toString() });
+      lookupConditions.push({ userId });
       if (mongoose.Types.ObjectId.isValid(userId)) {
-        orConditions.push({ userId: new mongoose.Types.ObjectId(userId) });
+        lookupConditions.push({ _id: new mongoose.Types.ObjectId(userId) });
       }
     }
-
-    if (email && email !== 'undefined' && email !== 'null') {
-      orConditions.push({ createdBy: email });
-      orConditions.push({ createdBy: email.toLowerCase() });
-    }
-
     if (contact && contact !== 'undefined' && contact !== 'null') {
-      orConditions.push({ contactNumber: contact });
-      orConditions.push({ createdBy: contact });
+      lookupConditions.push({ contactNumber: contact });
+    }
+    if (email && email !== 'undefined' && email !== 'null') {
+      lookupConditions.push({ email: email.toLowerCase() });
     }
 
-    if (name && name !== 'undefined' && name !== 'null') {
-      orConditions.push({ fullName: { $regex: new RegExp(`^${name.trim()}$`, 'i') } });
-    }
-
-    if (orConditions.length === 0) {
+    if (lookupConditions.length === 0) {
       return NextResponse.json(
-        { error: "User identifier (userId, email, contact, or name) is required" },
+        { error: "Unique citizen identifier (userId, contact, or email) is required" },
         { status: 400, headers: corsHeaders }
       );
+    }
+
+    // Step 1: Resolve the citizen record to obtain their canonical unique identifiers
+    const citizen = await User.findOne({ $or: lookupConditions });
+
+    // Step 2: Query applications strictly tied to this citizen's unique credentials
+    const orConditions: any[] = [];
+
+    if (citizen) {
+      if (citizen._id) orConditions.push({ userId: citizen._id });
+      if (citizen.userId) orConditions.push({ createdBy: citizen.userId });
+      if (citizen.contactNumber) {
+        orConditions.push({ contactNumber: citizen.contactNumber });
+        orConditions.push({ createdBy: citizen.contactNumber });
+      }
+      if (citizen.email) {
+        orConditions.push({ createdBy: citizen.email });
+        orConditions.push({ createdBy: citizen.email.toLowerCase() });
+      }
+    } else {
+      // Fallback for unlinked or legacy submissions using the raw passed identifiers
+      if (userId) orConditions.push({ createdBy: userId });
+      if (contact) orConditions.push({ contactNumber: contact }, { createdBy: contact });
+      if (email) orConditions.push({ createdBy: email.toLowerCase() });
     }
 
     const applications = await Application.find({ $or: orConditions }).sort({ createdAt: -1 });
