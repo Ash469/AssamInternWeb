@@ -29,14 +29,17 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
-// GET request - now handles both all applications and user-specific applications
+// GET request - handles both all applications and user-specific applications
 export const GET = async (req: NextRequest) => {
   const url = new URL(req.url);
   const userId = url.searchParams.get('userId');
+  const email = url.searchParams.get('email');
+  const contact = url.searchParams.get('contact');
+  const name = url.searchParams.get('name');
 
   try {
-    if (userId) {
-      // If userId provided, get applications by this user
+    if (userId || email || contact || name) {
+      // If user identifier provided, get applications by this user
       return await getApplicationsByUserId(req);
     } else {
       // Otherwise get all applications

@@ -1,9 +1,19 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { FaSync, FaFilter, FaEye, FaTimes, FaCheck } from 'react-icons/fa';
-import Image from 'next/image';
+import {
+  FaSync,
+  FaSearch,
+  FaCheck,
+  FaTimes,
+  FaUsers,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaCalendarAlt,
+} from 'react-icons/fa';
 import Footer from '@/app/components/footer';
+import AdminNavbar from '@/app/components/AdminNavbar';
 import AdminRouteProtection from '@/app/components/AdminRouteProtection';
 
 interface User {
@@ -16,6 +26,9 @@ interface User {
   contactNumber: string;
   age: number;
   gender: string;
+  district?: string;
+  revenueCircle?: string;
+  villageWard?: string;
   verified: boolean;
   createdAt: string;
 }
@@ -27,43 +40,67 @@ const AdminUser: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'All' | 'Verified' | 'Unverified'>('All');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [, setMessage] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ message: string; isError: boolean } | null>(null);
 
-  //const backendURL = 'http://localhost:10000';
+  const [adminRole, setAdminRole] = useState<string>('district_admin');
+  const [assignedDistrict, setAssignedDistrict] = useState<string | null>(null);
 
   useEffect(() => {
+    const userDataStr = localStorage.getItem('userData');
+    if (userDataStr) {
+      try {
+        const uData = JSON.parse(userDataStr);
+        setAdminRole(uData.role || 'district_admin');
+        setAssignedDistrict(uData.assignedDistrict || null);
+      } catch (e) {
+        console.error('Error parsing userData', e);
+      }
+    }
     fetchUsers();
   }, []);
 
   const fetchUsers = async () => {
     setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/getnewsignup');
-      if (!res.ok) throw new Error('Failed to fetch users');
+      const userDataStr = localStorage.getItem('userData');
+      let districtParam = '';
+      if (userDataStr) {
+        const uData = JSON.parse(userDataStr);
+        if (uData.role === 'district_admin' && uData.assignedDistrict) {
+          districtParam = `?district=${encodeURIComponent(uData.assignedDistrict)}`;
+        }
+      }
+
+      const res = await fetch(`/api/getnewsignup${districtParam}`);
+      if (!res.ok) throw new Error('Failed to fetch citizen registrations');
       const data = await res.json();
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mapped = data.users.map((u: any) => ({
+      const mapped = (data.users || []).map((u: any) => ({
         id: u._id,
-        firstName: u.firstName,
-        middleName: u.middleName,
-        lastName: u.lastName,
-        userId: u.userId,
-        email: u.email,
-        contactNumber: u.contactNumber,
-        age: u.age,
-        gender: u.gender,
-        verified: u.verified,
-        createdAt: new Date(u.createdAt).toLocaleDateString(),
-      })).reverse(); 
+        firstName: u.firstName || '',
+        middleName: u.middleName || '',
+        lastName: u.lastName || '',
+        userId: u.userId || '',
+        email: u.email || '',
+        contactNumber: u.contactNumber || '',
+        age: u.age || 0,
+        gender: u.gender || '',
+        district: u.district || 'Assam',
+        revenueCircle: u.revenueCircle || '',
+        villageWard: u.villageWard || '',
+        verified: !!u.verified,
+        createdAt: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'Recent',
+      })).reverse();
 
       setUsers(mapped);
-      setError(null);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err: unknown) {
-      setError('Failed to load users.');
+      console.error('Error fetching users:', err);
+      setError('Failed to load registered citizens.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const verifyUser = async (id: string) => {
@@ -76,21 +113,27 @@ const AdminUser: React.FC = () => {
 
       if (!res.ok) throw new Error('Verification failed.');
 
-      setMessage('User verified successfully.');
-      setSelectedUser(null);
-      fetchUsers();
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      setMessage('Failed to verify user.');
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, verified: true } : u))
+      );
+      if (selectedUser && selectedUser.id === id) {
+        setSelectedUser((prev) => (prev ? { ...prev, verified: true } : null));
+      }
+
+      setToastMessage({ message: 'Citizen profile verified successfully.', isError: false });
+    } catch (err: unknown) {
+      console.error('Verification error:', err);
+      setToastMessage({ message: 'Failed to verify citizen profile.', isError: true });
     }
   };
 
   const filteredUsers = users.filter((u) => {
+    const fullName = `${u.firstName} ${u.middleName} ${u.lastName}`.toLowerCase();
     const matchesSearch =
-      u.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      fullName.includes(searchQuery.toLowerCase()) ||
       u.userId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase());
+      u.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      u.contactNumber.includes(searchQuery);
 
     const matchesStatus =
       statusFilter === 'All' ||
@@ -100,175 +143,304 @@ const AdminUser: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const verifiedCount = users.filter((u) => u.verified).length;
+  const unverifiedCount = users.filter((u) => !u.verified).length;
+
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* Header Section */}
-        <header
-          className="relative min-h-[300px] sm:h-[400px] bg-cover bg-center"
-          style={{
-            backgroundImage: "linear-gradient(rgba(13, 148, 136, 0.9), rgba(13, 148, 136, 0.8)), url(/app_bar.png)"
-          }}
-        >
-          <div className="container mx-auto px-4 sm:px-8">
-            <div className="flex flex-col sm:flex-row justify-between items-center py-6"></div>
-            <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-              <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-white shadow-2xl overflow-hidden">
-                <Image
-                  src="/logo.png"
-                  alt="Logo"
-                  fill
-                  sizes="(max-width: 640px) 96px, 128px"
-                  style={{ objectFit: 'cover' }}
-                  priority
-                />
-              </div>
-              <div className="mt-4 sm:mt-0 sm:ml-4">
-                <div className="mt-4 sm:mt-0 sm:ml-4">
-                  <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-wide">
-                    User Management
-                  </h1>
-                  <p className="text-xl sm:text-2xl text-teal-100 mt-2">
-                    Manage and verify users efficiently
-                  </p>
+      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+        <AdminNavbar currentTab="user" />
 
-                </div>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="relative -mt-20 sm:-mt-32 z-10 container mx-auto px-4 sm:px-8 flex-grow pb-16">
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
-            {/* Filter Controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <div className="flex flex-wrap gap-4 w-full">
-                <div className="flex items-center gap-2 flex-1">
-                  <FaFilter className="text-teal-600" />
-                  <input
-                    type="text"
-                    placeholder="Search users..."
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm bg-white w-full"
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <FaFilter className="text-teal-600" />
-                  <select
-                    onChange={(e) => setStatusFilter(e.target.value as 'All' | 'Verified' | 'Unverified')}
-                    className="border rounded-md px-3 py-2 text-sm bg-white"
-                  >
-                    <option value="All">All Status</option>
-                    <option value="Verified">Verified</option>
-                    <option value="Unverified">Unverified</option>
-                  </select>
-                </div>
-                <button
-                  onClick={fetchUsers}
-                  className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
-                >
-                  <FaSync />
-                  <span>Refresh</span>
-                </button>
-              </div>
+        <main className="container mx-auto px-4 sm:px-8 py-8 flex-grow">
+          {/* Header row */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Registered Citizens
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">
+                {adminRole === 'super_admin'
+                  ? 'Statewide citizen directory and identity verification roster'
+                  : `Citizens registered under ${assignedDistrict || 'district jurisdiction'}`}
+              </p>
             </div>
 
-            {/* Users Grid */}
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
-              </div>
-            ) : error ? (
-              <div className="bg-red-50 text-red-600 p-4 rounded-lg text-center">
-                {error}
-              </div>
-            ) : (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                {filteredUsers.map((user, index) => (
-                  <div key={user.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="bg-teal-100 text-teal-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                          #{index + 1}
-                        </span>
-                        <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${user.verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                          }`}>
-                          {user.verified ? 'Verified' : 'Unverified'}
-                        </span>
-                      </div>
-
-                      <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {`${user.firstName} ${user.lastName}`}
-                        </h3>
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-600">{user.email}</p>
-                          <p className="text-sm text-gray-600">ID: {user.userId}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2 pt-3 border-t">
-                        <button
-                          onClick={() => setSelectedUser(user)}
-                          className="flex-1 flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                        >
-                          <FaEye className="mr-2" />
-                          View Details
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <button
+              onClick={fetchUsers}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            >
+              <FaSync className={`text-xs ${loading ? 'animate-spin' : ''}`} />
+              <span>Refresh Roster</span>
+            </button>
           </div>
+
+          {/* Quick Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <button
+              onClick={() => setStatusFilter('All')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                statusFilter === 'All'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              All Citizens <span className="ml-1 opacity-75">({users.length})</span>
+            </button>
+
+            <button
+              onClick={() => setStatusFilter('Verified')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'Verified'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Verified <span className="ml-1">({verifiedCount})</span>
+            </button>
+
+            <button
+              onClick={() => setStatusFilter('Unverified')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'Unverified'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-amber-700 hover:bg-amber-50'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              Unverified / Pending <span className="ml-1">({unverifiedCount})</span>
+            </button>
+          </div>
+
+          {/* Search bar */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 mb-6">
+            <div className="relative w-full max-w-md">
+              <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+              <input
+                type="text"
+                placeholder="Search by citizen name, user ID, email, phone..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-400 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Content */}
+          {loading ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-16 flex flex-col items-center justify-center">
+              <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin mb-3"></div>
+              <p className="text-xs text-slate-500">Loading citizen directory...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-rose-50 border border-rose-200 text-rose-700 rounded-xl p-4 text-xs">
+              {error}
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <FaUsers className="text-lg" />
+              </div>
+              <h3 className="text-sm font-semibold text-slate-800">No citizens found</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                No citizen profiles matched your filter criteria.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                      <th className="py-3 px-4">Citizen Profile</th>
+                      <th className="py-3 px-4">Contact</th>
+                      <th className="py-3 px-4">District / Area</th>
+                      <th className="py-3 px-4">Verification</th>
+                      <th className="py-3 px-4">Registered</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredUsers.map((u) => {
+                      const fullName = `${u.firstName} ${u.lastName}`.trim() || 'Citizen';
+                      const initials = `${u.firstName?.[0] || ''}${u.lastName?.[0] || ''}`.toUpperCase() || 'C';
+
+                      return (
+                        <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-200">
+                                {initials}
+                              </div>
+                              <div>
+                                <div className="font-semibold text-slate-900">{fullName}</div>
+                                <div className="text-[11px] text-slate-400">
+                                  {u.district} Resident
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="text-slate-900 flex items-center gap-1.5">
+                              <FaPhoneAlt className="text-[10px] text-slate-400" />
+                              <span>{u.contactNumber || 'No phone'}</span>
+                            </div>
+                            <div className="text-[11px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+                              <FaEnvelope className="text-[10px] text-slate-400" />
+                              <span className="truncate max-w-[180px]">{u.email || 'No email'}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="text-slate-900 font-medium">{u.district || 'Assam'}</div>
+                            <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                              <FaMapMarkerAlt className="text-[9px] text-slate-400" />
+                              <span>{u.villageWard || u.revenueCircle || 'District jurisdiction'}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                                u.verified
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  u.verified ? 'bg-emerald-500' : 'bg-amber-500'
+                                }`}
+                              ></span>
+                              {u.verified ? 'Verified' : 'Pending Verification'}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-slate-500">
+                            <div className="flex items-center gap-1 text-[11px]">
+                              <FaCalendarAlt className="text-[10px] text-slate-400" />
+                              <span>{u.createdAt}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                onClick={() => setSelectedUser(u)}
+                                className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                              >
+                                Details
+                              </button>
+
+                              {!u.verified && (
+                                <button
+                                  onClick={() => verifyUser(u.id)}
+                                  className="px-2.5 py-1 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold transition-colors flex items-center gap-1 cursor-pointer"
+                                >
+                                  <FaCheck className="text-[10px]" />
+                                  <span>Verify</span>
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </main>
 
-        {/* Add Footer at the bottom */}
-        <div className="mt-auto">
-          <Footer />
-        </div>
+        <Footer />
 
         {/* User Details Modal */}
         {selectedUser && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-teal-800">
-                  User Details
-                </h2>
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-y-auto border border-slate-200">
+              <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Citizen Profile Details</h2>
+                  <p className="text-xs text-slate-500">
+                    {selectedUser.district} Jurisdiction • Resident Profile
+                  </p>
+                </div>
                 <button
                   onClick={() => setSelectedUser(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <FaTimes />
+                  <FaTimes className="text-xs" />
                 </button>
               </div>
 
               <div className="p-6 space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <DetailItem label="User ID" value={selectedUser.userId || 'Not specified'} />
-                  <DetailItem 
-                    label="Full Name" 
-                    value={`${selectedUser.firstName || ''} ${selectedUser.middleName || ''} ${selectedUser.lastName || ''}`.trim() || 'Not specified'} 
-                  />
-                  <DetailItem label="Email" value={selectedUser.email || 'Not specified'} />
-                  <DetailItem label="Contact" value={selectedUser.contactNumber || 'Not specified'} />
-                  <DetailItem label="Age" value={selectedUser.age?.toString() || 'Not specified'} />
-                  <DetailItem label="Gender" value={selectedUser.gender || 'Not specified'} />
-                  <DetailItem label="Status" value={selectedUser.verified ? 'Verified' : 'Unverified'} />
-                  <DetailItem label="Joined Date" value={selectedUser.createdAt || 'Not specified'} />
+                <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <span className="text-xs text-slate-600 font-medium">Verification Status:</span>
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+                      selectedUser.verified
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}
+                  >
+                    {selectedUser.verified ? 'Verified Citizen' : 'Pending Verification'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-500 block text-[11px]">Full Name</span>
+                    <span className="font-semibold text-slate-900 text-sm mt-0.5 block">
+                      {`${selectedUser.firstName} ${selectedUser.middleName} ${selectedUser.lastName}`.trim() || 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-500 block text-[11px]">Contact Phone</span>
+                    <span className="font-semibold text-slate-900 text-sm mt-0.5 block">
+                      {selectedUser.contactNumber || 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-500 block text-[11px]">Email Address</span>
+                    <span className="font-medium text-slate-800 mt-0.5 block break-all">
+                      {selectedUser.email || 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-500 block text-[11px]">Age & Gender</span>
+                    <span className="font-medium text-slate-800 mt-0.5 block">
+                      {selectedUser.age || 'N/A'} yrs • {selectedUser.gender || 'Not specified'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-500 block text-[11px]">District</span>
+                    <span className="font-medium text-slate-800 mt-0.5 block">
+                      {selectedUser.district || 'Assam'}
+                    </span>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                    <span className="text-slate-500 block text-[11px]">Village / Ward</span>
+                    <span className="font-medium text-slate-800 mt-0.5 block">
+                      {selectedUser.villageWard || selectedUser.revenueCircle || 'N/A'}
+                    </span>
+                  </div>
                 </div>
 
                 {!selectedUser.verified && (
-                  <div className="mt-6 pt-4 border-t border-gray-200 flex justify-end">
+                  <div className="pt-4 border-t border-slate-200 flex justify-end">
                     <button
                       onClick={() => verifyUser(selectedUser.id)}
-                      className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer"
                     >
-                      <FaCheck />
-                      Verify User
+                      <FaCheck className="text-xs" />
+                      <span>Verify Citizen Profile</span>
                     </button>
                   </div>
                 )}
@@ -276,17 +448,30 @@ const AdminUser: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Toast */}
+        {toastMessage && (
+          <div className="fixed bottom-5 right-5 max-w-xs w-full z-50">
+            <div
+              className={`rounded-xl p-3.5 shadow-lg border text-xs flex items-center justify-between gap-2 ${
+                toastMessage.isError
+                  ? 'bg-rose-50 border-rose-200 text-rose-800'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
+              }`}
+            >
+              <span>{toastMessage.message}</span>
+              <button
+                onClick={() => setToastMessage(null)}
+                className="opacity-60 hover:opacity-100 transition-opacity"
+              >
+                <FaTimes className="text-xs" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </AdminRouteProtection>
   );
 };
-
-// Helper component for detail items
-const DetailItem = ({ label, value }: { label: string; value: string }) => (
-  <div>
-    <dt className="text-sm font-medium text-gray-500">{label}</dt>
-    <dd className="mt-1 text-sm text-gray-900">{value}</dd>
-  </div>
-);
 
 export default AdminUser;

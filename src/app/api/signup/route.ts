@@ -110,6 +110,9 @@ export async function POST(req: NextRequest) {
       userId,
       age,
       gender,
+      district: body.district || "Kamrup Metro",
+      verificationStatus: "pending",
+      verified: false,
       password: hashedPassword,
     });
 

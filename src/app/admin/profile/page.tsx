@@ -1,116 +1,157 @@
 'use client';
 
-import Footer from '@/app/components/footer';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import { FaUserShield, FaSignOutAlt, FaPhone, FaEnvelope } from 'react-icons/fa';
+import {
+  FaUserShield,
+  FaSignOutAlt,
+  FaPhone,
+  FaEnvelope,
+  FaMapMarkerAlt,
+  FaShieldAlt,
+} from 'react-icons/fa';
+import Footer from '@/app/components/footer';
+import AdminNavbar from '@/app/components/AdminNavbar';
 import AdminRouteProtection from '@/app/components/AdminRouteProtection';
 
 export default function AdminProfilePage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const [adminData, setAdminData] = useState<{
+    name: string;
+    email: string;
+    role: string;
+    phone: string;
+    assignedDistrict: string | null;
+  }>({
+    name: 'Administrator',
+    email: '',
+    role: 'district_admin',
+    phone: '',
+    assignedDistrict: null,
+  });
+
+  useEffect(() => {
+    const userDataStr = localStorage.getItem('userData');
+    if (userDataStr) {
+      try {
+        const u = JSON.parse(userDataStr);
+        setAdminData({
+          name: u.name || `${u.firstName || ''} ${u.lastName || ''}`.trim() || 'Administrator',
+          email: u.email || u.username || '',
+          role: u.role || 'district_admin',
+          phone: u.phone || u.contactNumber || 'Not specified',
+          assignedDistrict: u.assignedDistrict || null,
+        });
+      } catch (e) {
+        console.error('Error parsing admin data:', e);
+      }
+    }
+  }, []);
 
   const handleLogout = () => {
-    setLoading(true);
     localStorage.removeItem('userData');
-    setTimeout(() => {
-      router.push('/'); 
-    }, 500);
+    localStorage.removeItem('adminToken');
+    router.push('/admin/adminlogin');
   };
 
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen flex flex-col bg-gray-100">
-        <header 
-          className="relative min-h-[200px] bg-cover bg-center" 
-          style={{ 
-            backgroundImage: "linear-gradient(rgba(13, 148, 136, 0.9), rgba(13, 148, 136, 0.8)), url(/app_bar.png)"
-          }}
-        >
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white text-center tracking-wide">
-              Admin Profile
-            </h1>
-          </div>
-        </header>
+      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+        <AdminNavbar />
 
-        <main className="flex-grow relative -mt-20 z-10 container mx-auto px-4 pb-12">
-          <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-            <div className="flex flex-col md:flex-row">
-              <div className="md:w-1/2 bg-teal-700 p-8 flex flex-col items-center justify-center">
-                <div className="w-40 h-40 rounded-full bg-white/10 backdrop-blur-sm 
-                                flex items-center justify-center text-white text-6xl 
-                                border-4 border-white/30 shadow-2xl mb-6">
-                  <FaUserShield />
-                </div>
-                <span className="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full 
-                               text-white font-semibold mb-4 border border-white/20">
-                  ADMINISTRATOR
-                </span>
-                <h2 className="text-3xl font-bold text-white mb-2">Admin User</h2>
-                <p className="text-teal-100">@admin123</p>
+        <main className="container mx-auto px-4 sm:px-8 py-10 flex-grow flex items-center justify-center">
+          <div className="max-w-xl w-full bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            {/* Header info */}
+            <div className="p-6 sm:p-8 border-b border-slate-100 flex items-center gap-5">
+              <div className="w-16 h-16 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-2xl font-bold shadow-sm">
+                <FaUserShield />
               </div>
-              <div className="md:w-1/2 p-8">
-                <div className="space-y-6">
-                  <h3 className="text-2xl font-bold text-teal-800 mb-6">
-                    Profile Details
-                  </h3>
-
-                  <InfoItem 
-                    icon={<FaUserShield />}
-                    label="Full Name"
-                    value="Admin User"
-                  />
-                  <Divider />
-                  <InfoItem 
-                    icon={<FaPhone />}
-                    label="Phone Number"
-                    value="+91 9801589162"
-                  />
-                  <Divider />
-                  <InfoItem 
-                    icon={<FaEnvelope />}
-                    label="Email"
-                    value="admin@assam.gov.in"
-                  />
-
-                  <button
-                    onClick={handleLogout}
-                    disabled={loading}
-                    className={`w-full flex items-center justify-center p-4 mt-8
-                              ${loading ? 'bg-teal-400' : 'bg-teal-600 hover:bg-teal-700'}
-                              text-white rounded-lg transition-colors`}
-                  >
-                    <FaSignOutAlt className="text-xl mr-2" />
-                    <span className="text-lg font-semibold">
-                      {loading ? 'Logging out...' : 'Logout'}
-                    </span>
-                  </button>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h1 className="text-xl font-bold text-slate-900 tracking-tight">
+                    {adminData.name}
+                  </h1>
+                  <span className="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold uppercase px-2 py-0.5 rounded">
+                    Official
+                  </span>
                 </div>
+                <p className="text-xs text-slate-500 font-mono">
+                  Role: {adminData.role === 'super_admin' ? 'Central Super Administrator' : 'District Administrator'}
+                </p>
+              </div>
+            </div>
+
+            {/* Profile Fields */}
+            <div className="p-6 sm:p-8 space-y-4">
+              <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+                Assigned Credentials & Scope
+              </h2>
+
+              <div className="grid grid-cols-1 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs">
+                    <FaMapMarkerAlt />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate-500 block">Jurisdiction Scope</span>
+                    <span className="font-semibold text-slate-900 text-xs">
+                      {adminData.assignedDistrict ? `${adminData.assignedDistrict} District` : 'Statewide (All Districts)'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs">
+                    <FaEnvelope />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate-500 block">Official Email</span>
+                    <span className="font-semibold text-slate-900 text-xs">
+                      {adminData.email || 'Not specified'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs">
+                    <FaPhone />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate-500 block">Contact Information</span>
+                    <span className="font-semibold text-slate-900 text-xs">
+                      {adminData.phone}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 flex items-center justify-center text-xs">
+                    <FaShieldAlt />
+                  </div>
+                  <div>
+                    <span className="text-[11px] text-slate-500 block">Access Control Level</span>
+                    <span className="font-semibold text-slate-900 text-xs">
+                      District Grievance Resolution & Citizen Verification
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-6 border-t border-slate-100">
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2.5 px-4 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <FaSignOutAlt className="text-xs" />
+                  <span>Terminate Session & Logout</span>
+                </button>
               </div>
             </div>
           </div>
         </main>
-        <div className="mt-auto">
-          <Footer />
-        </div>
+
+        <Footer />
       </div>
     </AdminRouteProtection>
   );
-}
-
-function InfoItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center space-x-4">
-      <div className="text-2xl text-teal-600">{icon}</div>
-      <div>
-        <div className="text-sm text-teal-600 font-medium">{label}</div>
-        <div className="text-lg text-gray-800">{value}</div>
-      </div>
-    </div>
-  );
-}
-
-function Divider() {
-  return <hr className="border-t border-teal-100" />;
 }

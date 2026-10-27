@@ -1,21 +1,30 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaSync, FaTimes, FaTrash, FaBell } from 'react-icons/fa';
-import Image from 'next/image';
+import {
+  FaPlus,
+  FaTrash,
+  FaCheck,
+  FaTimes,
+  FaSync,
+  FaBullhorn,
+  FaCalendarAlt,
+  FaEye,
+} from 'react-icons/fa';
 import Footer from '@/app/components/footer';
+import AdminNavbar from '@/app/components/AdminNavbar';
 import AdminRouteProtection from '@/app/components/AdminRouteProtection';
 
 interface Notification {
   _id?: string;
   title: string;
   content: string;
-  createdAt?: string;
-  date?: string;
+  date: string;
   active: boolean;
+  createdAt?: string;
 }
 
-const AdminNotification: React.FC = () => {
+export default function NotificationManagement() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -40,20 +49,20 @@ const AdminNotification: React.FC = () => {
       }
       const data = await response.json();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const formattedNotifications = data.map((notification: any) => ({
-        _id: notification._id,
-        title: notification.title,
-        content: notification.content,
-        date: new Date(notification.createdAt).toISOString().split('T')[0],
-        active: true, 
-        createdAt: notification.createdAt
+      const formatted = (data || []).map((n: any) => ({
+        _id: n._id,
+        title: n.title,
+        content: n.content,
+        date: n.createdAt ? new Date(n.createdAt).toLocaleDateString() : 'Recent',
+        active: true,
+        createdAt: n.createdAt,
       }));
-      
-      setNotifications(formattedNotifications);
+
+      setNotifications(formatted);
       setError('');
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      setError('Failed to load notifications. Please try again.');
+    } catch (err) {
+      console.error('Error fetching notifications:', err);
+      setError('Failed to load notifications.');
     } finally {
       setLoadingNotifications(false);
     }
@@ -61,52 +70,49 @@ const AdminNotification: React.FC = () => {
 
   const addNotification = async () => {
     if (!title.trim() || !content.trim()) {
-      setError('Please fill in all fields.');
+      setError('Please provide both title and content.');
       return;
     }
 
     setLoading(true);
     setError('');
-    
+
     try {
       const response = await fetch('/api/notification', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title, content }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to create notification');
       }
-      
+
       const data = await response.json();
-      
-      // Add the new notification to the state
+
       const newNotification: Notification = {
-        _id: data.notification._id,
+        _id: data.notification?._id,
         title,
         content,
-        date: new Date().toISOString().split('T')[0],
+        date: new Date().toLocaleDateString(),
         active: true,
-        createdAt: data.notification.createdAt
+        createdAt: data.notification?.createdAt,
       };
-      
+
       setNotifications([newNotification, ...notifications]);
       setTitle('');
       setContent('');
       setActionResult({
-        message: 'Notification created successfully',
-        isError: false
+        message: 'Broadcast notice published successfully',
+        isError: false,
       });
     } catch (err) {
       console.error('Error creating notification:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create notification');
+      setError(err instanceof Error ? err.message : 'Failed to publish notice');
       setActionResult({
-        message: err instanceof Error ? err.message : 'Failed to create notification',
-        isError: true
+        message: err instanceof Error ? err.message : 'Failed to publish notice',
+        isError: true,
       });
     } finally {
       setLoading(false);
@@ -126,254 +132,297 @@ const AdminNotification: React.FC = () => {
 
   const deleteNotification = async (index: number) => {
     const notification = notifications[index];
-    
-    if (!notification._id) {
+    if (!notification?._id) {
       setError('Cannot delete notification without ID');
       return;
     }
-    
+
     try {
       const response = await fetch(`/api/notification?id=${notification._id}`, {
         method: 'DELETE',
       });
-      
+
       if (!response.ok) {
-        throw new Error(`Failed to delete notification: ${response.status} ${response.statusText}`);
+        throw new Error('Failed to delete notification');
       }
-      
+
       const updated = [...notifications];
       updated.splice(index, 1);
       setNotifications(updated);
       setShowConfirmation(false);
       setActionResult({
         message: 'Notification deleted successfully',
-        isError: false
+        isError: false,
       });
     } catch (err) {
       console.error('Error deleting notification:', err);
       setError(err instanceof Error ? err.message : 'Failed to delete notification');
       setActionResult({
         message: err instanceof Error ? err.message : 'Failed to delete notification',
-        isError: true
+        isError: true,
       });
     }
   };
 
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* Header Section */}
-        <header
-          className="relative min-h-[250px] sm:h-[350px] bg-cover bg-center"
-          style={{
-            background: 'linear-gradient(rgba(13, 148, 136, 0.9), rgba(13, 148, 136, 0.8))',
-          }}
-        >
-          <div className="container mx-auto px-4 sm:px-8">
-            <div className="flex flex-col sm:flex-row justify-between items-center py-6"></div>
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-white shadow-2xl overflow-hidden">
-                  <Image
-                    src="/logo.png"
-                    alt="Logo"
-                    fill
-                    sizes="(max-width: 640px) 96px, 128px"
-                    style={{ objectFit: 'cover' }}
-                    priority
-                  />
-                </div>
-                <div className="mt-4 sm:mt-0 sm:ml-4">
-                  <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-wide">Notification Management</h1>
-                  <p className="text-xl sm:text-2xl text-teal-100 mt-2">Admin Dashboard</p>
-                </div>
-              </div>
+      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+        <AdminNavbar currentTab="notification" />
 
-              <button
-                onClick={fetchNotifications}
-                className="mt-6 sm:mt-0 bg-white/10 hover:bg-white/20 text-white px-6 sm:px-8 py-3 rounded-lg flex items-center gap-3 backdrop-blur-sm transition-all border-2 border-white/20 shadow-lg w-full sm:w-auto justify-center"
-              >
-                <FaSync className="text-xl sm:text-2xl" />
-                <span className="text-base sm:text-lg font-semibold">Refresh</span>
-              </button>
+        <main className="container mx-auto px-4 sm:px-8 py-8 flex-grow">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Broadcasts & Public Notices
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">
+                Publish district-level civic advisories, community updates, and emergency notices
+              </p>
             </div>
-          </div>
-        </header>
 
-        <main className="relative -mt-24 sm:-mt-40 z-10 container mx-auto px-4 sm:px-8 flex-grow pb-16">
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 mb-8">
-            <h2 className="text-xl font-bold text-teal-700 mb-6">Add New Notification</h2>
-            <div className="space-y-4">
-              <div>
-                <input
-                  type="text"
-                  placeholder="Title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full p-3 border-2 border-teal-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors"
-                />
-              </div>
-              <div>
-                <textarea
-                  placeholder="Content"
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  className="w-full p-3 border-2 border-teal-200 rounded-lg focus:border-teal-500 focus:outline-none transition-colors h-32"
-                />
-              </div>
-              {error && <p className="text-red-500">{error}</p>}
-              <button 
-                onClick={addNotification}
-                disabled={loading}
-                className={`bg-teal-600 text-white px-6 py-3 rounded-lg hover:bg-teal-700 transition-colors font-semibold ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-              >
-                {loading ? 'Adding...' : 'Add Notification'}
-              </button>
-            </div>
+            <button
+              onClick={fetchNotifications}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            >
+              <FaSync className={`text-xs ${loadingNotifications ? 'animate-spin' : ''}`} />
+              <span>Refresh Notices</span>
+            </button>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-bold text-teal-700">Notifications List</h2>
-            </div>
-            
-            {/* Notifications List */}
-            {loadingNotifications ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
-              </div>
-            ) : notifications.length === 0 ? (
-              <div className="text-center text-gray-500 py-12">No notifications available.</div>
-            ) : (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                {notifications.map((notification, index) => (
-                  <div
-                    key={index}
-                    className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="bg-teal-100 text-teal-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                          #{index + 1}
-                        </span>
-                        <span
-                          className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
-                            notification.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                          }`}
-                        >
-                          {notification.active ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-
-                      <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1 truncate">{notification.title}</h3>
-                        <p className="text-sm text-gray-600 line-clamp-3">{notification.content}</p>
-                        <p className="text-xs text-gray-500 mt-2">Date: {notification.date}</p>
-                      </div>
-
-                      <div className="flex gap-1 sm:gap-2 pt-3 border-t">
-                        <button
-                          onClick={() => setSelectedNotification(notification)}
-                          className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-xs sm:text-sm"
-                        >
-                          <FaBell className="mr-1 sm:mr-2" />
-                          View
-                        </button>
-                        <button
-                          onClick={() => toggleActive(index)}
-                          className={`flex-1 flex items-center justify-center px-2 sm:px-3 py-2 rounded-md transition-colors text-xs sm:text-sm ${
-                            notification.active 
-                              ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                              : 'bg-green-100 text-green-700 hover:bg-green-200'
-                          }`}
-                        >
-                          <FaSync className="mr-1 sm:mr-2" />
-                          {notification.active ? 'Deactivate' : 'Activate'}
-                        </button>
-                        <button
-                          onClick={() => handleDeleteConfirmation(index)}
-                          className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-xs sm:text-sm"
-                        >
-                          <FaTrash className="mr-1 sm:mr-2" />
-                          Delete
-                        </button>
-                      </div>
-                    </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left: Compose Notice */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 sticky top-24">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                  <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xs">
+                    <FaPlus />
                   </div>
-                ))}
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900">Issue New Notice</h2>
+                    <p className="text-[11px] text-slate-500">Visible to portal citizens</p>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-xs">
+                    {error}
+                  </div>
+                )}
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      Notice Title
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., Road repair schedule in Ward 4"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                      Notice Content
+                    </label>
+                    <textarea
+                      placeholder="Provide complete public advisory details..."
+                      rows={5}
+                      value={content}
+                      onChange={(e) => setContent(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-400 transition-colors resize-none"
+                    />
+                  </div>
+
+                  <button
+                    onClick={addNotification}
+                    disabled={loading}
+                    className="w-full py-2.5 px-4 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <FaBullhorn className="text-xs" />
+                    <span>{loading ? 'Publishing Notice...' : 'Publish Announcement'}</span>
+                  </button>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Right: Published Notices Feed */}
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5">
+                <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                  <h2 className="text-sm font-bold text-slate-900">
+                    Published Notices ({notifications.length})
+                  </h2>
+                  <span className="text-[11px] text-slate-500">Latest active broadcasts</span>
+                </div>
+
+                {loadingNotifications ? (
+                  <div className="py-16 flex flex-col items-center justify-center">
+                    <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin mb-3"></div>
+                    <p className="text-xs text-slate-500">Loading notices...</p>
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="py-12 text-center">
+                    <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                      <FaBullhorn className="text-lg" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-slate-800">No notices published yet</h3>
+                    <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                      Use the composer form on the left to broadcast announcements to citizens.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {notifications.map((item, index) => (
+                      <div
+                        key={item._id || index}
+                        className="p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-all bg-white"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-grow">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                  item.active
+                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                    : 'bg-slate-100 text-slate-500 border border-slate-200'
+                                }`}
+                              >
+                                <span
+                                  className={`w-1.5 h-1.5 rounded-full ${
+                                    item.active ? 'bg-emerald-500' : 'bg-slate-400'
+                                  }`}
+                                ></span>
+                                {item.active ? 'Active' : 'Archived'}
+                              </span>
+                              <div className="flex items-center gap-1 text-[11px] text-slate-400">
+                                <FaCalendarAlt className="text-[9px]" />
+                                <span>{item.date}</span>
+                              </div>
+                            </div>
+
+                            <h3 className="text-sm font-bold text-slate-900 mb-1">
+                              {item.title}
+                            </h3>
+                            <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                              {item.content}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-1 flex-shrink-0">
+                            <button
+                              onClick={() => setSelectedNotification(item)}
+                              title="View details"
+                              className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs transition-colors cursor-pointer"
+                            >
+                              <FaEye />
+                            </button>
+
+                            <button
+                              onClick={() => toggleActive(index)}
+                              title={item.active ? 'Archive' : 'Activate'}
+                              className={`p-2 rounded-lg text-xs transition-colors cursor-pointer ${
+                                item.active
+                                  ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200'
+                                  : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                              }`}
+                            >
+                              <FaCheck />
+                            </button>
+
+                            <button
+                              onClick={() => handleDeleteConfirmation(index)}
+                              title="Delete notice"
+                              className="p-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs transition-colors cursor-pointer"
+                            >
+                              <FaTrash />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </main>
 
-        <div className="mt-auto">
-          <Footer />
-        </div>
+        <Footer />
 
-        {/* View Notification Modal */}
+        {/* View Modal */}
         {selectedNotification && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-teal-800">Notification Details</h2>
-                <button
-                  onClick={() => setSelectedNotification(null)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <span className="sr-only">Close</span>
-                  <FaTimes />
-                </button>
-              </div>
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg border border-slate-200 overflow-hidden">
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold ${
+                        selectedNotification.active
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          : 'bg-slate-100 text-slate-500 border border-slate-200'
+                      }`}
+                    >
+                      {selectedNotification.active ? 'Active' : 'Archived'}
+                    </span>
+                    <span className="text-[11px] text-slate-400">
+                      {selectedNotification.date}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setSelectedNotification(null)}
+                    className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center text-xs transition-colors cursor-pointer"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
 
-              <div className="p-6 space-y-4">
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Title</h3>
-                    <p className="mt-1 text-gray-800">{selectedNotification.title}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Content</h3>
-                    <p className="mt-1 text-gray-800 whitespace-pre-wrap">{selectedNotification.content}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Date</h3>
-                    <p className="mt-1 text-gray-800">{selectedNotification.date}</p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Status</h3>
-                    <p className="mt-1 text-gray-800">{selectedNotification.active ? 'Active' : 'Inactive'}</p>
-                  </div>
+                <h2 className="text-base font-bold text-slate-900 mb-3">
+                  {selectedNotification.title}
+                </h2>
+                <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed whitespace-pre-wrap max-h-96 overflow-y-auto">
+                  {selectedNotification.content}
+                </div>
+
+                <div className="mt-5 flex justify-end">
+                  <button
+                    onClick={() => setSelectedNotification(null)}
+                    className="px-4 py-2 rounded-lg bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    Close
+                  </button>
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Confirmation Modal */}
-        {showConfirmation && confirmationData && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-              <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Confirm Deletion</h3>
-              </div>
-
-              <div className="p-6">
-                <p className="text-gray-700">
-                  Are you sure you want to delete this notification? This action cannot be undone.
+        {/* Delete Confirmation Modal */}
+        {showConfirmation && confirmationData !== null && (
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200">
+              <div className="p-5">
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Delete Notice</h3>
+                <p className="text-xs text-slate-600">
+                  Are you sure you want to permanently delete this broadcast announcement? This action cannot be undone.
                 </p>
 
-                <div className="mt-6 flex justify-end space-x-3">
+                <div className="mt-5 flex justify-end gap-2">
                   <button
                     onClick={() => setShowConfirmation(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="px-3.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => deleteNotification(confirmationData.index)}
-                    className="px-4 py-2 rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                    className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 transition-colors cursor-pointer"
                   >
-                    Delete
+                    Delete Permanently
                   </button>
                 </div>
               </div>
@@ -381,32 +430,27 @@ const AdminNotification: React.FC = () => {
           </div>
         )}
 
-        {/* Action Result Toast */}
+        {/* Toast */}
         {actionResult && (
-          <div className="fixed bottom-4 right-4 max-w-sm w-full">
+          <div className="fixed bottom-5 right-5 max-w-xs w-full z-50">
             <div
-              className={`rounded-lg shadow-lg p-4 ${
-                actionResult.isError ? 'bg-red-50 border-l-4 border-red-600' : 'bg-green-50 border-l-4 border-green-600'
+              className={`rounded-xl p-3.5 shadow-lg border text-xs flex items-center justify-between gap-2 ${
+                actionResult.isError
+                  ? 'bg-rose-50 border-rose-200 text-rose-800'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
               }`}
             >
-              <div className="flex justify-between">
-                <p
-                  className={`text-sm font-medium ${
-                    actionResult.isError ? 'text-red-800' : 'text-green-800'
-                  }`}
-                >
-                  {actionResult.message}
-                </p>
-                <button onClick={() => setActionResult(null)} className="text-gray-400 hover:text-gray-600">
-                  <FaTimes />
-                </button>
-              </div>
+              <span>{actionResult.message}</span>
+              <button
+                onClick={() => setActionResult(null)}
+                className="opacity-60 hover:opacity-100 transition-opacity"
+              >
+                <FaTimes className="text-xs" />
+              </button>
             </div>
           </div>
         )}
       </div>
     </AdminRouteProtection>
   );
-};
-
-export default AdminNotification;
+}

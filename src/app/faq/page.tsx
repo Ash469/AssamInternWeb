@@ -11,14 +11,7 @@ export default function FAQPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if the user is authenticated
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // Redirect to login page if no token exists
-      router.push('/userlogin');
-    }
-  }, [router]);
+
 
   // Toggle FAQ open/close
   const toggleFaq = (index: number) => {

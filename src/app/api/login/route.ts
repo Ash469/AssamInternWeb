@@ -56,21 +56,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user is verified
-    if (!user.verified) {
-      return new NextResponse(
-        JSON.stringify({ 
-          status: "error",
-          message: "Account not verified",
-          details: "Please contact support for verification." 
-        }), 
-        { 
-          status: 403,
-          headers: corsHeaders
-        }
-      );
-    }
-
     const isMatch = await bcrypt.compare(password, user.password);
 
     if (!isMatch) {
@@ -87,13 +72,13 @@ export async function POST(req: NextRequest) {
     }
 
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, verified: !!user.verified },
       process.env.JWT_SECRET as string,
       { expiresIn: "7d" }
     );
 
     // Log successful login
-    console.log(`User logged in successfully: ${user.email || user.contactNumber} (${user.firstName} ${user.lastName})`);
+    console.log(`User logged in: ${user.email || user.contactNumber} (${user.firstName} ${user.lastName}) [Verified: ${user.verified}]`);
 
     return new NextResponse(
       JSON.stringify({
@@ -101,10 +86,20 @@ export async function POST(req: NextRequest) {
         message: "Login successful",
         token,
         user: {
+          id: user._id,
+          userId: user.userId,
           email: user.email,
           contactNumber: user.contactNumber,
           firstName: user.firstName,
+          middleName: user.middleName || "",
           lastName: user.lastName,
+          district: user.district,
+          revenueCircle: user.revenueCircle || "",
+          villageWard: user.villageWard || "",
+          age: user.age,
+          gender: user.gender,
+          verified: !!user.verified,
+          verificationStatus: user.verificationStatus || (user.verified ? "approved" : "pending"),
         },
       }), 
       { 

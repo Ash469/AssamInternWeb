@@ -36,7 +36,11 @@ export async function PATCH(req: NextRequest) {
 
     const updatedUser = await User.findByIdAndUpdate(
       _id,
-      { verified: true },
+      { 
+        verified: true,
+        verificationStatus: "approved",
+        verifiedAt: new Date()
+      },
       { new: true, runValidators: true }
     ).select("-password");
 

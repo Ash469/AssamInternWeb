@@ -1,26 +1,41 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { FaEye, FaCheck, FaTimes, FaSync, FaFilter, FaSearch } from 'react-icons/fa';
-import Image from 'next/image';
+import {
+  FaCheck,
+  FaTimes,
+  FaSync,
+  FaFilter,
+  FaSearch,
+  FaFileAlt,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaCalendarAlt,
+  FaExternalLinkAlt,
+} from 'react-icons/fa';
 import Footer from '@/app/components/footer';
+import AdminNavbar from '@/app/components/AdminNavbar';
 import AdminRouteProtection from '@/app/components/AdminRouteProtection';
 
 interface Application {
   id: string;
   fullName: string;
   age: number;
-  contactNumber: string; 
+  contactNumber: string;
   gender: string;
   district: string;
   revenueCircle: string;
   category: string;
   villageWard: string;
+  specificLocation?: string;
+  problemTitle?: string;
+  description?: string;
   remarks: string;
+  adminRemarks?: string;
   documentUrl: string;
   status: string;
-  date: string; 
+  date: string;
 }
 
 export default function AdminApplicationsPage() {
@@ -35,310 +50,596 @@ export default function AdminApplicationsPage() {
   const [confirmationData, setConfirmationData] = useState<{ id: string; status: string } | null>(null);
   const [actionResult, setActionResult] = useState<{ message: string; isError: boolean } | null>(null);
 
-  useEffect(() => {
-    fetchApplications();
-  }, []);
+  const [adminRole, setAdminRole] = useState<string>('district_admin');
+  const [assignedDistrict, setAssignedDistrict] = useState<string | null>(null);
 
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get('/api/applications');
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const mappedData = res.data.data.map((item: any) => ({
-        id: item._id,
-        fullName: item.fullName || '',
-        age: item.age || 0,
-        contactNumber: item.contactNumber || '', 
-        gender: item.gender || '',
-        district: item.district || '',
-        revenueCircle: item.revenueCircle || '',
-        category: item.category || '',
-        villageWard: item.villageWard || '',
-        remarks: item.remarks || '',
-        documentUrl: item.documentUrl || '',
-        status: item.status || 'Pending',
-        date: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : '',
-      })).reverse();
-
-      setApplications(mappedData);
       setError(null);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+      const userDataStr = localStorage.getItem('userData');
+      let districtParam = '';
+      if (userDataStr) {
+        try {
+          const u = JSON.parse(userDataStr);
+          if (u.role === 'district_admin' && u.assignedDistrict) {
+            districtParam = `?district=${encodeURIComponent(u.assignedDistrict)}`;
+          }
+        } catch (e) {
+          console.error('Error reading userData for district param', e);
+        }
+      }
+
+      const res = await axios.get(`/api/applications${districtParam}`);
+
+      // Handle all possible response shapes: { data: [...] } or { applications: [...] } or [...]
+      let rawList: any[] = [];
+      if (Array.isArray(res.data)) {
+        rawList = res.data;
+      } else if (res.data && Array.isArray(res.data.data)) {
+        rawList = res.data.data;
+      } else if (res.data && Array.isArray(res.data.applications)) {
+        rawList = res.data.applications;
+      }
+
+      const mapped: Application[] = rawList.map((app: any) => ({
+        id: app._id || app.id || String(Math.random()),
+        fullName: app.fullName || 'Anonymous Citizen',
+        age: app.age || 0,
+        contactNumber: app.contactNumber || '',
+        gender: app.gender || '',
+        district: app.district || '',
+        revenueCircle: app.revenueCircle || '',
+        category: app.category || 'General',
+        villageWard: app.villageWard || '',
+        specificLocation: app.specificLocation || '',
+        problemTitle: app.problemTitle || '',
+        description: app.description || '',
+        remarks: app.remarks || app.description || '',
+        adminRemarks: app.adminRemarks || '',
+        documentUrl: app.documentUrl || '',
+        status: app.status || 'Pending',
+        date: app.createdAt || app.date || new Date().toISOString(),
+      }));
+
+      setApplications(mapped);
     } catch (err: unknown) {
-      setError('Failed to fetch applications');
+      console.error('Error fetching applications:', err);
+      const msg =
+        axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : 'Failed to load applications';
+      setError(msg);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const updateStatus = async (id: string, status: string) => {
-    if (!id) {
-      setActionResult({
-        message: 'Invalid application ID',
-        isError: true,
-      });
-      return;
-    }
-
-    try {
-      const response = await axios.put('/api/applications', {
-        applicationId: id,
-        status: status,
-      });
-
-      if (response.status === 200) {
-        setActionResult({
-          message: `Application status updated to ${status}`,
-          isError: false,
-        });
-        await fetchApplications();
-        setShowConfirmation(false);
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error('Error updating status:', err.response?.data || err.message);
-        setActionResult({
-          message: `Error updating status: ${err.response?.data?.error || 'Please try again'}`,
-          isError: true,
-        });
-      } else {
-        console.error('Error updating status:', err);
-        setActionResult({
-          message: 'An unexpected error occurred',
-          isError: true,
-        });
+  useEffect(() => {
+    const userDataStr = localStorage.getItem('userData');
+    if (userDataStr) {
+      try {
+        const u = JSON.parse(userDataStr);
+        setAdminRole(u.role || 'district_admin');
+        setAssignedDistrict(u.assignedDistrict || null);
+      } catch (e) {
+        console.error('Error reading userData', e);
       }
     }
-  };
+    fetchApplications();
+  }, [fetchApplications]);
 
-  // Function to handle the confirmation modal
   const handleStatusUpdate = (id: string, status: string) => {
     setConfirmationData({ id, status });
     setShowConfirmation(true);
   };
 
+  const updateStatus = async (id: string, newStatus: string) => {
+    try {
+      setShowConfirmation(false);
+      const res = await axios.put('/api/applications', {
+        id,
+        applicationId: id,
+        status: newStatus,
+      });
+
+      if (res.status === 200) {
+        setApplications((prev) =>
+          prev.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
+        );
+        if (selectedApp && selectedApp.id === id) {
+          setSelectedApp((prev) => (prev ? { ...prev, status: newStatus } : null));
+        }
+        setActionResult({
+          message: `Application marked as "${newStatus}" successfully`,
+          isError: false,
+        });
+      }
+    } catch (err: unknown) {
+      console.error('Error updating application status:', err);
+      const msg =
+        axios.isAxiosError(err) && (err.response?.data?.error || err.response?.data?.message)
+          ? err.response.data.error || err.response.data.message
+          : 'Failed to update application status';
+      setActionResult({ message: msg, isError: true });
+    }
+  };
+
+  // Helper status checkers
+  const isApprovedStatus = (s: string) =>
+    ['approved', 'resolved', 'action taken'].includes((s || '').toLowerCase());
+  const isPendingStatus = (s: string) =>
+    ['pending', 'in review', 'in progress'].includes((s || '').toLowerCase());
+  const isRejectedStatus = (s: string) =>
+    (s || '').toLowerCase() === 'rejected';
+
+  // Filter logic
   const filteredApplications = applications.filter((app) => {
-    const matchesStatus = statusFilter === 'all' || app.status === statusFilter;
-    const matchesCategory = categoryFilter === 'all' || app.category === categoryFilter;
-    const matchesSearch = searchTerm === '' || 
-      app.fullName.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesCategory && matchesSearch;
+    const q = searchTerm.toLowerCase();
+    const matchesSearch =
+      !searchTerm ||
+      (app.fullName && app.fullName.toLowerCase().includes(q)) ||
+      (app.contactNumber && app.contactNumber.includes(q)) ||
+      (app.id && app.id.toLowerCase().includes(q)) ||
+      (app.problemTitle && app.problemTitle.toLowerCase().includes(q)) ||
+      (app.villageWard && app.villageWard.toLowerCase().includes(q)) ||
+      (app.district && app.district.toLowerCase().includes(q));
+
+    const matchesCategory =
+      categoryFilter === 'all' ||
+      (app.category && app.category.toLowerCase() === categoryFilter.toLowerCase());
+
+    let matchesStatus = true;
+    if (statusFilter === 'pending') {
+      matchesStatus = isPendingStatus(app.status);
+    } else if (statusFilter === 'approved') {
+      matchesStatus = isApprovedStatus(app.status);
+    } else if (statusFilter === 'rejected') {
+      matchesStatus = isRejectedStatus(app.status);
+    } else if (statusFilter !== 'all') {
+      matchesStatus = app.status.toLowerCase() === statusFilter.toLowerCase();
+    }
+
+    return matchesSearch && matchesCategory && matchesStatus;
   });
 
-  // Get unique categories from applications
-  const categories = ['all', ...new Set(applications.map((app) => app.category))];
-  const statuses = ['all', 'Pending', 'Approved', 'Rejected'];
+  const categories = ['all', ...Array.from(new Set(applications.map((app) => app.category).filter(Boolean)))];
+
+  const pendingCount = applications.filter((a) => isPendingStatus(a.status)).length;
+  const approvedCount = applications.filter((a) => isApprovedStatus(a.status)).length;
+  const rejectedCount = applications.filter((a) => isRejectedStatus(a.status)).length;
 
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen bg-gray-100 flex flex-col">
-        {/* Header Section */}
-        <header
-          className="relative min-h-[250px] sm:h-[350px] bg-cover bg-center"
-          style={{
-            background: 'linear-gradient(rgba(13, 148, 136, 0.9), rgba(13, 148, 136, 0.8))',
-          }}
-        >
-          <div className="container mx-auto px-4 sm:px-8">
-            <div className="flex flex-col sm:flex-row justify-between items-center py-6"></div>
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-center sm:text-left">
-              <div className="flex flex-col sm:flex-row items-center gap-4">
-                <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-xl border-4 border-white shadow-2xl overflow-hidden">
-                  <Image
-                    src="/logo.png"
-                    alt="Logo"
-                    fill
-                    sizes="(max-width: 640px) 96px, 128px"
-                    style={{ objectFit: 'cover' }}
-                    priority
-                  />
-                </div>
-                <div className="mt-4 sm:mt-0 sm:ml-4">
-                  <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-wide">Application Management</h1>
-                  <p className="text-xl sm:text-2xl text-teal-100 mt-2">Admin Dashboard</p>
-                </div>
-              </div>
+      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+        <AdminNavbar currentTab="application" />
 
-              <button
-                onClick={fetchApplications}
-                className="mt-6 sm:mt-0 bg-white/10 hover:bg-white/20 text-white px-6 sm:px-8 py-3 rounded-lg flex items-center gap-3 backdrop-blur-sm transition-all border-2 border-white/20 shadow-lg w-full sm:w-auto justify-center"
-              >
-                <FaSync className="text-xl sm:text-2xl" />
-                <span className="text-base sm:text-lg font-semibold">Refresh</span>
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <main className="relative -mt-24 sm:-mt-40 z-10 container mx-auto px-4 sm:px-8 flex-grow pb-16">
-          <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6">
-            {/* Filter Controls */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h2 className="text-lg sm:text-xl font-semibold text-gray-800">Applications List</h2>
-              <div className="flex flex-wrap gap-4 w-full sm:w-auto">
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <FaSearch className="text-teal-600 min-w-[1rem]" />
-                  <input
-                    type="text"
-                    placeholder="Search by name..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm bg-white w-full sm:min-w-[340px]"
-                  />
-                </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <FaFilter className="text-teal-600 min-w-[1rem]" />
-                  <select
-                    value={categoryFilter}
-                    onChange={(e) => setCategoryFilter(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm bg-white w-full sm:w-auto"
-                  >
-                    {categories.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat === 'all' ? 'All Categories' : cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <FaFilter className="text-teal-600 min-w-[1rem]" />
-                  <select
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                    className="border rounded-md px-3 py-2 text-sm bg-white w-full sm:w-auto"
-                  >
-                    {statuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status === 'all' ? 'All Statuses' : status}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+        <main className="container mx-auto px-4 sm:px-8 py-8 flex-grow">
+          {/* Header row */}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+                Grievance Applications
+              </h1>
+              <p className="text-xs text-slate-500 mt-1">
+                {adminRole === 'super_admin'
+                  ? 'Review and manage statewide grievance records across all Assam districts'
+                  : `Review and process applications submitted in ${assignedDistrict || 'your district'}`}
+              </p>
             </div>
 
-            {/* Loading and Error States */}
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-700"></div>
-              </div>
-            ) : error ? (
-              <div className="bg-red-50 text-red-600 p-4 rounded-lg text-center">{error}</div>
-            ) : applications.length === 0 ? (
-              <div className="text-center text-gray-500 py-12">No applications found.</div>
-            ) : (
-              <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
-                {filteredApplications.map((app, index) => (
-                  <div
-                    key={app.id}
-                    className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="p-4">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="bg-teal-100 text-teal-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                          #{index + 1}
-                        </span>
-                        <span
-                          className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${
-                            app.status === 'Approved'
-                              ? 'bg-green-100 text-green-800'
-                              : app.status === 'Rejected'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {app.status}
-                        </span>
-                      </div>
-
-                      <div className="mb-4">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-1">{app.fullName}</h3>
-                        <div className="space-y-1">
-                          <p className="text-sm text-gray-600">
-                            Category: <span className="font-medium">{app.category}</span>
-                          </p>
-                          <p className="text-sm text-gray-600">Date: {app.date}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-1 sm:gap-2 pt-3 border-t">
-                        <button
-                          onClick={() => setSelectedApp(app)}
-                          className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors text-xs sm:text-sm"
-                        >
-                          <FaEye className="mr-1 sm:mr-2" />
-                          View
-                        </button>
-                        <button
-                          onClick={() => handleStatusUpdate(app.id, 'Approved')}
-                          className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors text-xs sm:text-sm"
-                        >
-                          <FaCheck className="mr-1 sm:mr-2" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleStatusUpdate(app.id, 'Rejected')}
-                          className="flex-1 flex items-center justify-center px-2 sm:px-3 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors text-xs sm:text-sm"
-                        >
-                          <FaTimes className="mr-1 sm:mr-2" />
-                          Reject
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <button
+              onClick={fetchApplications}
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors cursor-pointer"
+            >
+              <FaSync className={`text-xs ${loading ? 'animate-spin' : ''}`} />
+              <span>Refresh Records</span>
+            </button>
           </div>
+
+          {/* Quick Filter Tabs */}
+          <div className="flex flex-wrap items-center gap-2 mb-6">
+            <button
+              onClick={() => setStatusFilter('all')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                statusFilter === 'all'
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              All Records <span className="ml-1 opacity-75">({applications.length})</span>
+            </button>
+
+            <button
+              onClick={() => setStatusFilter('pending')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'pending'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-amber-700 hover:bg-amber-50'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+              Pending & Review <span className="ml-1">({pendingCount})</span>
+            </button>
+
+            <button
+              onClick={() => setStatusFilter('approved')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'approved'
+                  ? 'bg-emerald-600 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Approved & Resolved <span className="ml-1">({approvedCount})</span>
+            </button>
+
+            <button
+              onClick={() => setStatusFilter('rejected')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                statusFilter === 'rejected'
+                  ? 'bg-rose-600 text-white shadow-xs'
+                  : 'bg-white border border-slate-200 text-rose-700 hover:bg-rose-50'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+              Rejected <span className="ml-1">({rejectedCount})</span>
+            </button>
+          </div>
+
+          {/* Search and Category Filter Toolbar */}
+          <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div className="relative w-full sm:w-96">
+                <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+                <input
+                  type="text"
+                  placeholder="Search by title, citizen name, phone, village..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                />
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <FaFilter className="text-slate-400 text-xs hidden sm:block" />
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  aria-label="Filter applications by category"
+                  className="w-full sm:w-auto bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-700 focus:outline-none focus:bg-white focus:border-slate-400 transition-colors"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat === 'all' ? 'All Categories' : cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Applications Content */}
+          {loading ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-16 flex flex-col items-center justify-center">
+              <div className="w-8 h-8 border-2 border-slate-300 border-t-slate-800 rounded-full animate-spin mb-3"></div>
+              <p className="text-xs text-slate-500">Loading grievance applications...</p>
+            </div>
+          ) : error ? (
+            <div className="bg-rose-50 border border-rose-200 text-rose-700 rounded-xl p-4 text-xs">
+              {error}
+            </div>
+          ) : filteredApplications.length === 0 ? (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-12 text-center">
+              <div className="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+                <FaFileAlt className="text-lg" />
+              </div>
+              <h3 className="text-sm font-semibold text-slate-800">No applications matched</h3>
+              <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+                {applications.length === 0
+                  ? 'No grievance applications have been submitted in this district yet.'
+                  : 'Try adjusting your search terms or filter settings.'}
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead>
+                    <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 font-semibold uppercase tracking-wider text-[11px]">
+                      <th className="py-3 px-4">Grievance & Applicant</th>
+                      <th className="py-3 px-4">Location</th>
+                      <th className="py-3 px-4">Category</th>
+                      <th className="py-3 px-4">Status</th>
+                      <th className="py-3 px-4">Submitted</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {filteredApplications.map((app) => {
+                      const isPending = isPendingStatus(app.status);
+                      const isApproved = isApprovedStatus(app.status);
+                      const isRejected = isRejectedStatus(app.status);
+
+                      return (
+                        <tr key={app.id} className="hover:bg-slate-50/80 transition-colors">
+                          <td className="py-3.5 px-4 max-w-xs">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-full bg-slate-100 text-slate-700 font-bold text-xs flex items-center justify-center border border-slate-200 flex-shrink-0 mt-0.5">
+                                {app.fullName ? app.fullName.charAt(0).toUpperCase() : 'A'}
+                              </div>
+                              <div>
+                                {app.problemTitle && (
+                                  <div className="font-bold text-slate-900 line-clamp-1 mb-0.5">
+                                    {app.problemTitle}
+                                  </div>
+                                )}
+                                <div className="font-medium text-slate-700 text-[11px]">
+                                  {app.fullName}
+                                </div>
+                                <div className="text-[11px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+                                  <FaPhoneAlt className="text-[9px]" />
+                                  <span>{app.contactNumber || 'No phone'}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <div className="text-slate-900 font-medium">{app.district || 'District N/A'}</div>
+                            <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
+                              <FaMapMarkerAlt className="text-[9px] text-slate-400" />
+                              <span className="truncate max-w-[150px]">
+                                {app.specificLocation || app.villageWard || app.revenueCircle || 'Assam'}
+                              </span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <span className="inline-block bg-slate-100 text-slate-700 border border-slate-200 px-2 py-0.5 rounded text-[11px] font-medium">
+                              {app.category || 'General'}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4">
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                                isApproved
+                                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                  : isRejected
+                                  ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                                  : 'bg-amber-50 text-amber-700 border border-amber-200'
+                              }`}
+                            >
+                              <span
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  isApproved
+                                    ? 'bg-emerald-500'
+                                    : isRejected
+                                    ? 'bg-rose-500'
+                                    : 'bg-amber-500'
+                                }`}
+                              ></span>
+                              {app.status || 'Pending'}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-slate-500">
+                            <div className="flex items-center gap-1 text-[11px]">
+                              <FaCalendarAlt className="text-[10px] text-slate-400" />
+                              <span>{app.date ? new Date(app.date).toLocaleDateString() : 'Recent'}</span>
+                            </div>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="inline-flex items-center gap-1.5">
+                              <button
+                                onClick={() => setSelectedApp(app)}
+                                className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-colors cursor-pointer"
+                              >
+                                Review
+                              </button>
+
+                              {!isApproved && (
+                                <button
+                                  onClick={() => handleStatusUpdate(app.id, 'Approved')}
+                                  title="Approve Grievance"
+                                  className="p-1.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 transition-colors cursor-pointer"
+                                >
+                                  <FaCheck className="text-xs" />
+                                </button>
+                              )}
+
+                              {!isRejected && (
+                                <button
+                                  onClick={() => handleStatusUpdate(app.id, 'Rejected')}
+                                  title="Reject Grievance"
+                                  className="p-1.5 rounded bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer"
+                                >
+                                  <FaTimes className="text-xs" />
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
         </main>
 
-        <div className="mt-auto">
-          <Footer />
-        </div>
-        
+        <Footer />
+
+        {/* Modal: View & Review Application */}
         {selectedApp && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-teal-800">Application Details</h2>
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200">
+              <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-10">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900">Application Review</h2>
+                  <p className="text-xs text-slate-500">
+                    {selectedApp.district} Jurisdiction • Submitted {new Date(selectedApp.date).toLocaleDateString()}
+                  </p>
+                </div>
                 <button
                   onClick={() => setSelectedApp(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <span className="sr-only">Close</span>
-                  <FaTimes />
+                  <FaTimes className="text-xs" />
                 </button>
               </div>
 
-              <div className="p-6 space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <DetailItem label="ID" value={selectedApp.id} />
-                  <DetailItem label="Full Name" value={selectedApp.fullName} />
-                  <DetailItem label="Age" value={selectedApp.age.toString()} />
-                  <DetailItem label="Gender" value={selectedApp.gender} />
-                  <DetailItem label="Contact" value={selectedApp.contactNumber} />
-                  <DetailItem label="District" value={selectedApp.district} />
-                  <DetailItem label="Revenue Circle" value={selectedApp.revenueCircle} />
-                  <DetailItem label="Village/Ward" value={selectedApp.villageWard} />
-                  <DetailItem label="Category" value={selectedApp.category} />
-                  <DetailItem label="Status" value={selectedApp.status} />
-                  <DetailItem label="Date" value={selectedApp.date} />
-                  <DetailItem label="Remarks" value={selectedApp.remarks || 'None'} />
+              <div className="p-6 space-y-5">
+                {/* Status bar */}
+                <div className="flex items-center justify-between p-3 rounded-lg bg-slate-50 border border-slate-200">
+                  <span className="text-xs text-slate-600 font-medium">Current Status:</span>
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
+                      isApprovedStatus(selectedApp.status)
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                        : isRejectedStatus(selectedApp.status)
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    }`}
+                  >
+                    {selectedApp.status || 'Pending'}
+                  </span>
                 </div>
 
+                {/* Problem Title & Description */}
+                {selectedApp.problemTitle && (
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      Grievance Subject
+                    </h3>
+                    <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 font-semibold text-slate-900 text-sm">
+                      {selectedApp.problemTitle}
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Problem Description & Citizen Remarks
+                  </h3>
+                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-800 leading-relaxed whitespace-pre-wrap">
+                    {selectedApp.description || selectedApp.remarks || 'No detailed description provided.'}
+                  </div>
+                </div>
+
+                {/* Details Grid */}
+                <div>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Applicant Information
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">Full Name</span>
+                      <span className="font-semibold text-slate-900 text-sm mt-0.5 block">
+                        {selectedApp.fullName}
+                      </span>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">Contact Phone</span>
+                      <span className="font-semibold text-slate-900 text-sm mt-0.5 block">
+                        {selectedApp.contactNumber}
+                      </span>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">Age & Gender</span>
+                      <span className="font-medium text-slate-800 mt-0.5 block">
+                        {selectedApp.age || 'N/A'} yrs • {selectedApp.gender || 'Not specified'}
+                      </span>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">Category</span>
+                      <span className="font-medium text-slate-800 mt-0.5 block">
+                        {selectedApp.category}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Jurisdiction & Location
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">District</span>
+                      <span className="font-medium text-slate-800 mt-0.5 block">
+                        {selectedApp.district}
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">Revenue Circle</span>
+                      <span className="font-medium text-slate-800 mt-0.5 block">
+                        {selectedApp.revenueCircle || 'N/A'}
+                      </span>
+                    </div>
+                    <div className="p-3 rounded-lg bg-slate-50 border border-slate-100">
+                      <span className="text-slate-500 block text-[11px]">Village / Ward</span>
+                      <span className="font-medium text-slate-800 mt-0.5 block">
+                        {selectedApp.specificLocation || selectedApp.villageWard || 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Document attachment if available */}
                 {selectedApp.documentUrl && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h3 className="font-semibold text-gray-900 mb-2">Documents</h3>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                      Attached Document / Evidence
+                    </h3>
+                    {selectedApp.documentUrl.match(/\.(jpeg|jpg|png|webp|gif|heic|heif)(\?|$)/i) && (
+                      <div className="mb-2 max-h-48 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={selectedApp.documentUrl}
+                          alt="Grievance evidence"
+                          className="w-full h-44 object-cover"
+                        />
+                      </div>
+                    )}
                     <a
                       href={selectedApp.documentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-teal-600 hover:text-teal-800 underline"
+                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors"
                     >
-                      View Document
+                      <FaExternalLinkAlt className="text-[10px]" />
+                      <span>Open Full Evidence File (Secure Presigned Link)</span>
                     </a>
                   </div>
                 )}
+
+                {/* Status action buttons */}
+                <div className="pt-4 border-t border-slate-200 flex flex-col sm:flex-row gap-2 justify-end">
+                  <button
+                    onClick={() => handleStatusUpdate(selectedApp.id, 'Approved')}
+                    className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <FaCheck className="text-xs" />
+                    <span>Approve Grievance</span>
+                  </button>
+
+                  <button
+                    onClick={() => handleStatusUpdate(selectedApp.id, 'Rejected')}
+                    className="px-4 py-2 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                  >
+                    <FaTimes className="text-xs" />
+                    <span>Reject Grievance</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -346,34 +647,31 @@ export default function AdminApplicationsPage() {
 
         {/* Confirmation Modal */}
         {showConfirmation && confirmationData && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden">
-              <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium text-gray-900">Confirm Status Update</h3>
-              </div>
-
-              <div className="p-6">
-                <p className="text-gray-700">
-                  Are you sure you want to mark this application as{' '}
-                  <span className="font-semibold">{confirmationData.status}</span>?
+          <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden border border-slate-200">
+              <div className="p-5">
+                <h3 className="text-sm font-bold text-slate-900 mb-2">Confirm Status Update</h3>
+                <p className="text-xs text-slate-600">
+                  Are you sure you want to change the status of this application to{' '}
+                  <strong className="text-slate-900">{confirmationData.status}</strong>?
                 </p>
 
-                <div className="mt-6 flex justify-end space-x-3">
+                <div className="mt-5 flex justify-end gap-2">
                   <button
                     onClick={() => setShowConfirmation(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="px-3.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-50 text-xs font-medium transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => updateStatus(confirmationData.id, confirmationData.status)}
-                    className={`px-4 py-2 rounded-md text-sm font-medium text-white ${
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white transition-colors cursor-pointer ${
                       confirmationData.status === 'Approved'
-                        ? 'bg-green-600 hover:bg-green-700'
-                        : 'bg-red-600 hover:bg-red-700'
+                        ? 'bg-emerald-600 hover:bg-emerald-700'
+                        : 'bg-rose-600 hover:bg-rose-700'
                     }`}
                   >
-                    Confirm
+                    Confirm Update
                   </button>
                 </div>
               </div>
@@ -381,26 +679,23 @@ export default function AdminApplicationsPage() {
           </div>
         )}
 
-        {/* Result Toast Notification */}
+        {/* Action result toast */}
         {actionResult && (
-          <div className="fixed bottom-4 right-4 max-w-sm w-full">
+          <div className="fixed bottom-5 right-5 max-w-xs w-full z-50">
             <div
-              className={`rounded-lg shadow-lg p-4 ${
-                actionResult.isError ? 'bg-red-50 border-l-4 border-red-600' : 'bg-green-50 border-l-4 border-green-600'
+              className={`rounded-xl p-3.5 shadow-lg border text-xs flex items-center justify-between gap-2 ${
+                actionResult.isError
+                  ? 'bg-rose-50 border-rose-200 text-rose-800'
+                  : 'bg-emerald-50 border-emerald-200 text-emerald-800'
               }`}
             >
-              <div className="flex justify-between">
-                <p
-                  className={`text-sm font-medium ${
-                    actionResult.isError ? 'text-red-800' : 'text-green-800'
-                  }`}
-                >
-                  {actionResult.message}
-                </p>
-                <button onClick={() => setActionResult(null)} className="text-gray-400 hover:text-gray-600">
-                  <FaTimes />
-                </button>
-              </div>
+              <span>{actionResult.message}</span>
+              <button
+                onClick={() => setActionResult(null)}
+                className="opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+              >
+                <FaTimes className="text-xs" />
+              </button>
             </div>
           </div>
         )}
@@ -408,11 +703,3 @@ export default function AdminApplicationsPage() {
     </AdminRouteProtection>
   );
 }
-
-// Helper component for detail items
-const DetailItem = ({ label, value }: { label: string; value: string }) => (
-  <div>
-    <dt className="text-sm font-medium text-gray-500">{label}</dt>
-    <dd className="mt-1 text-sm text-gray-900">{value}</dd>
-  </div>
-);

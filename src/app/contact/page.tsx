@@ -20,14 +20,7 @@ const Contact = () => {
   const [submitted, setSubmitted] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    // Check if the user is authenticated
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // Redirect to login page if no token exists
-      router.push('/userlogin');
-    }
-  }, [router]);
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });

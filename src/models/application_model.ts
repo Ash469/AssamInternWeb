@@ -1,71 +1,135 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
+import { ASSAM_DISTRICTS, AssamDistrict } from "@/config/districts";
 
-// Categories
-const CATEGORY_OPTIONS = [
+// Categories for Grievances & Applications
+export const APPLICATION_CATEGORIES = [
+  "Roads & Infrastructure",
+  "Drinking Water Supply",
+  "Electricity & Power",
+  "Flood & Disaster Relief",
+  "Healthcare & Hospitals",
+  "Education & Schools",
+  "Sanitation & Drainage",
+  "Public Safety & Police",
+  "Welfare Schemes & Pension",
+  "Administration & Revenue",
+  "Agriculture & Irrigation",
   "Administration",
   "Legal",
   "Business",
-  "Others",
-  "Education",
-  "Finance",
   "Disaster Relief",
+  "Finance",
+  "Education",
+  "Others",
 ] as const;
 
-const STATUS_OPTIONS = ["Pending", "Approved", "Rejected"] as const;
+export const APPLICATION_STATUSES = [
+  "Pending",
+  "In Review",
+  "In Progress",
+  "Action Taken",
+  "Approved",
+  "Resolved",
+  "Rejected",
+] as const;
 
-type CategoryType = (typeof CATEGORY_OPTIONS)[number];
-type StatusType = (typeof STATUS_OPTIONS)[number];
-type AreaType = "Village" | "Ward";
-type GenderType = "Male" | "Female" | "Other";
+export type ApplicationCategory = (typeof APPLICATION_CATEGORIES)[number];
+export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+export type AreaType = "Village" | "Ward" | string;
+export type GenderType = "Male" | "Female" | "Other";
 
-interface IApplication extends Document {
+export interface IApplication extends Document {
+  // Citizen Information
   fullName: string;
-  age: number;
+  age?: number;
   contactNumber: string;
-  gender: GenderType;
-  district: string;
-  revenueCircle: string;
-  category: CategoryType;
-  villageWard: AreaType;
+  gender?: GenderType;
+  
+  // Scoped Location
+  district: AssamDistrict | string;
+  revenueCircle?: string;
+  villageWard?: AreaType;
+  specificLocation?: string;
+
+  // Grievance / Problem Details
+  category: ApplicationCategory | string;
+  problemTitle?: string;
+  description?: string;
   remarks?: string;
-  documentUrl?: string;
-  status: StatusType;
-  createdBy: string; // Added field to track who created the application
+  documentUrl?: string; // Photos / PDF of the problem
+  storagePath?: string; // Internal storage path in Supabase / R2
+  
+  // Status & Tracking
+  status: ApplicationStatus;
+  createdBy: string; // User ID / Email of citizen (Must be verified)
+  userId?: Types.ObjectId; // Reference to User model
+
+  // Resolution Tracking by District Admin or Super Admin
+  reviewedBy?: Types.ObjectId; // Reference to Admin / SuperAdmin
+  reviewedByModel?: "Admin" | "SuperAdmin";
+  adminRemarks?: string;
+  actionTaken?: string;
+  resolvedAt?: Date;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 // Mongoose Schema
 const ApplicationSchema = new Schema<IApplication>(
   {
-    fullName: { type: String, required: true },
-    age: { type: Number, required: true },
+    fullName: { type: String, required: true, trim: true },
+    age: { type: Number },
     contactNumber: {
       type: String,
       required: true,
+      trim: true,
       match: [/^\d{10}$/, "Invalid contact number format (must be 10 digits)"],
     },
-    gender: { type: String, enum: ["Male", "Female", "Other"], required: true },
-    district: { type: String, required: true },
-    revenueCircle: { type: String, required: true },
-    category: { type: String, required: true, enum: CATEGORY_OPTIONS },
-    villageWard: { type: String, required: true, enum: ["Village", "Ward"] },
-    remarks: { type: String },
-    documentUrl: {
-      type: String,
-      validate: {
-        validator: function (v: string) {
-          return !v || /^(https?:\/\/.*\.(?:png|jpg|jpeg|pdf|docx?))$/i.test(v);
-        },
-        message: "Invalid document URL format",
-      },
-      default: "",
+    gender: { type: String, enum: ["Male", "Female", "Other"] },
+    
+    // District is mandatory for district admin scoping
+    district: { 
+      type: String, 
+      required: true, 
+      index: true,
+      trim: true 
     },
-    status: { type: String, enum: STATUS_OPTIONS, default: "Pending" },
-    createdBy: { type: String, required: true }, // Store the userId who created this application
+    revenueCircle: { type: String, trim: true },
+    villageWard: { type: String, trim: true },
+    specificLocation: { type: String, trim: true },
+
+    category: { type: String, required: true, trim: true },
+    problemTitle: { type: String, trim: true },
+    description: { type: String, trim: true },
+    remarks: { type: String, trim: true },
+    documentUrl: { type: String, default: "" },
+    storagePath: { type: String, default: "" },
+
+    status: {
+      type: String,
+      enum: APPLICATION_STATUSES,
+      default: "Pending",
+      index: true,
+    },
+    createdBy: { type: String, required: true, index: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User" },
+
+    reviewedBy: { type: Schema.Types.ObjectId, refPath: "reviewedByModel" },
+    reviewedByModel: { type: String, enum: ["Admin", "SuperAdmin"] },
+    adminRemarks: { type: String, trim: true },
+    actionTaken: { type: String, trim: true },
+    resolvedAt: { type: Date },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-// Model
+// Compound Index: District Admins query applications by their district & status
+ApplicationSchema.index({ district: 1, status: 1 });
+ApplicationSchema.index({ createdBy: 1, createdAt: -1 });
+
 const Application: Model<IApplication> =
   mongoose.models.Application || mongoose.model<IApplication>("Application", ApplicationSchema);
 
