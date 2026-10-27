@@ -55,7 +55,7 @@ export interface SignedUploadUrlResult {
  */
 export async function createSignedUploadUrl(
   filePath: string,
-  expiresIn: number = 300,
+  _expiresIn: number = 300,
   bucket: string = DEFAULT_BUCKET
 ): Promise<SignedUploadUrlResult> {
   const supabase = getSupabaseAdmin();
@@ -67,16 +67,16 @@ export async function createSignedUploadUrl(
       upsert: true,
     });
 
-  // If bucket does not exist, try creating it automatically
+  // If bucket does not exist, try creating it automatically as private
   if (error && (error.message.includes('not found') || error.message.includes('Bucket'))) {
     try {
-      await supabase.storage.createBucket(bucket, { public: true });
+      await supabase.storage.createBucket(bucket, { public: false });
       const retry = await supabase.storage
         .from(bucket)
         .createSignedUploadUrl(filePath, { upsert: true });
       data = retry.data;
       error = retry.error;
-    } catch (_) {
+    } catch {
       // Ignore createBucket error and let standard error handling take over
     }
   }
@@ -127,7 +127,7 @@ export function extractStoragePath(urlOrPath: string, bucket: string = DEFAULT_B
       if (match && match[1]) {
         clean = decodeURIComponent(match[1]);
       }
-    } catch (_) {}
+    } catch {}
   }
 
   // Strip bucket prefix if present
@@ -202,7 +202,7 @@ export async function uploadBufferDirect(
   buffer: Buffer | Uint8Array,
   contentType: string,
   bucket: string = DEFAULT_BUCKET
-): Promise<{ publicUrl: string; storagePath: string }> {
+): Promise<{ storagePath: string }> {
   const supabase = getSupabaseAdmin();
 
   let { data, error } = await supabase.storage.from(bucket).upload(filePath, buffer, {
@@ -210,17 +210,17 @@ export async function uploadBufferDirect(
     upsert: true,
   });
 
-  // If bucket does not exist, try creating it
+  // If bucket does not exist, try creating it as private
   if (error && (error.message.includes('not found') || error.message.includes('Bucket'))) {
     try {
-      await supabase.storage.createBucket(bucket, { public: true });
+      await supabase.storage.createBucket(bucket, { public: false });
       const retry = await supabase.storage.from(bucket).upload(filePath, buffer, {
         contentType,
         upsert: true,
       });
       data = retry.data;
       error = retry.error;
-    } catch (_) {}
+    } catch {}
   }
 
   if (error || !data) {

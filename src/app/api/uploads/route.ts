@@ -23,7 +23,6 @@ export async function POST(req: NextRequest) {
       (formData.get("fullName") as string) ||
       (formData.get("name") as string) ||
       "";
-    const category = (formData.get("category") as string) || "General";
 
     if (!file) {
       return NextResponse.json(

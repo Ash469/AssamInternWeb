@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import Footer from '@/app/components/footer';
-import { FaCloudUploadAlt, FaChevronLeft, FaCheckCircle, FaExclamationCircle, FaShieldAlt } from 'react-icons/fa';
+import { FaCloudUploadAlt, FaChevronLeft, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
 import jwt_decode from 'jwt-decode';
 
 export default function NewApplicationPage() {
@@ -131,7 +131,7 @@ export default function NewApplicationPage() {
 
   const uploadEvidenceFile = async (
     file: File
-  ): Promise<{ publicUrl: string; storagePath: string } | null> => {
+  ): Promise<{ storagePath: string } | null> => {
     setIsUploading(true);
     setUploadStatus('Preparing upload...');
 

@@ -1,5 +1,5 @@
 import mongoose, { Schema, Document, Model, Types } from "mongoose";
-import { ASSAM_DISTRICTS, AssamDistrict } from "@/config/districts";
+import { AssamDistrict } from "@/config/districts";
 
 // Categories for Grievances & Applications
 export const APPLICATION_CATEGORIES = [

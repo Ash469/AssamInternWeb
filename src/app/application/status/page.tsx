@@ -1,13 +1,10 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import NavBar from '../../components/nav_bar';
 import Footer from '@/app/components/footer';
 import { 
-  FaFilter, 
-  FaEye, 
   FaFileAlt, 
   FaPlus, 
   FaSearch, 
@@ -16,14 +13,11 @@ import {
   FaCheckCircle, 
   FaClock, 
   FaTimesCircle, 
-  FaInfoCircle, 
   FaPrint, 
-  FaExternalLinkAlt,
-  FaTimes,
-  FaUser,
-  FaPhoneAlt,
-  FaShieldAlt,
-  FaSyncAlt
+  FaExternalLinkAlt, 
+  FaTimes, 
+  FaShieldAlt, 
+  FaSyncAlt 
 } from 'react-icons/fa';
 
 interface ApplicationItem {
@@ -59,23 +53,11 @@ export default function ApplicationStatusPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedApp, setSelectedApp] = useState<ApplicationItem | null>(null);
   
-  // User Profile from LocalStorage
-  const [currentUser, setCurrentUser] = useState<{
-    id?: string;
-    userId?: string;
-    fullName?: string;
-    email?: string;
-    contactNumber?: string;
-  } | null>(null);
-
-  const router = useRouter();
-
   // Load user session and fetch applications
   const loadData = async () => {
     setLoading(true);
     setError('');
 
-    const token = localStorage.getItem('token');
     const profileStr = localStorage.getItem('userProfile');
     const storedUserId = localStorage.getItem('userId');
 
@@ -97,8 +79,6 @@ export default function ApplicationStatusPage() {
     } else if (storedUserId) {
       userObj.id = storedUserId;
     }
-
-    setCurrentUser(userObj);
 
     try {
       // Build query string with all available user identifiers

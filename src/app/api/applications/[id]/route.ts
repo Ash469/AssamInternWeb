@@ -21,7 +21,7 @@ export async function OPTIONS() {
 // GET /api/applications/[id]
 export async function GET(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> | { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const params = await context.params;
@@ -39,7 +39,7 @@ export async function GET(
 // PUT /api/applications/[id]
 export async function PUT(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> | { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const params = await context.params;
@@ -57,7 +57,7 @@ export async function PUT(
 // PATCH /api/applications/[id]
 export async function PATCH(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> | { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const params = await context.params;
@@ -75,7 +75,7 @@ export async function PATCH(
 // DELETE /api/applications/[id]
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ id: string }> | { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const params = await context.params;

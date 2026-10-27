@@ -9,7 +9,6 @@
 
 import {
   createSignedUploadUrl as supabaseCreateUploadUrl,
-  createSignedDownloadUrl as supabaseCreateDownloadUrl,
   checkFileExists as supabaseCheckExists,
   DEFAULT_BUCKET,
   SignedUploadUrlResult,
