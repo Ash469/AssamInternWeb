@@ -63,7 +63,7 @@ export default function NavBar() {
               <span className="text-sm font-heading font-extrabold text-[#111318] tracking-tight block leading-tight">
                 Jan Sambad
               </span>
-              <span className="text-[8px] font-bold tracking-[0.25em] text-[#687180] uppercase block">
+              <span className="text-xs font-bold tracking-widest text-[#687180] uppercase block">
                 ASSAM
               </span>
             </div>
@@ -101,7 +101,7 @@ export default function NavBar() {
                   href="/profile"
                   className="flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#DEDCD5] hover:bg-[#FAF9F5] text-[#111318] text-xs font-semibold transition-all"
                 >
-                  <div className="w-4 h-4 rounded-full bg-[#111318] text-white flex items-center justify-center text-[9px] font-bold">
+                  <div className="w-4 h-4 rounded-full bg-[#111318] text-white flex items-center justify-center text-xs font-bold">
                     {userName.charAt(0).toUpperCase()}
                   </div>
                   <span className="truncate max-w-[100px]">{userName}</span>

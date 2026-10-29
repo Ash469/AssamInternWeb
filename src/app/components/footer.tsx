@@ -13,14 +13,14 @@ const Footer: React.FC = () => {
               <span className="text-lg font-heading font-extrabold text-white tracking-tight">
                 Jan Sambad
               </span>
-              <span className="text-[10px] font-bold tracking-[0.2em] text-[#F36D21] bg-[#F36D21]/15 px-2 py-0.5 rounded border border-[#F36D21]/30">
+              <span className="text-xs font-bold tracking-wider text-[#F36D21] bg-[#F36D21]/15 px-2 py-0.5 rounded border border-[#F36D21]/30">
                 ASSAM
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed max-w-md mb-4">
+            <p className="text-xs sm:text-sm text-white/70 leading-relaxed max-w-md mb-4">
               A unified digital public infrastructure for Assamese citizens to report, track, and resolve civic grievances directly with district officials across all 35 districts.
             </p>
-            <div className="flex items-center gap-2 text-xs text-[#94A3B8]">
+            <div className="flex items-center gap-2 text-xs text-white/70">
               <ShieldCheck size={15} className="text-[#23845B]" />
               <span>Official Citizen Grievance Redressal System</span>
             </div>
@@ -28,32 +28,32 @@ const Footer: React.FC = () => {
 
           {/* Citizen Links */}
           <div>
-            <h4 className="text-xs font-heading font-bold uppercase tracking-wider text-[#94A3B8] mb-4">
+            <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-white/70 mb-4">
               Quick Links
-            </h4>
+            </h3>
             <ul className="space-y-2 text-xs font-medium">
               <li>
-                <Link href="/userlogin" className="text-[#CBD5E1] hover:text-white transition-colors">
+                <Link href="/userlogin" className="text-white/80 hover:text-white transition-colors">
                   Citizen Login
                 </Link>
               </li>
               <li>
-                <Link href="/usersignup" className="text-[#CBD5E1] hover:text-white transition-colors">
+                <Link href="/usersignup" className="text-white/80 hover:text-white transition-colors">
                   New Citizen Registration
                 </Link>
               </li>
               <li>
-                <Link href="/application/status" className="text-[#CBD5E1] hover:text-white transition-colors">
+                <Link href="/application/status" className="text-white/80 hover:text-white transition-colors">
                   Track Application Status
                 </Link>
               </li>
               <li>
-                <Link href="/application/new" className="text-[#CBD5E1] hover:text-white transition-colors">
+                <Link href="/application/new" className="text-white/80 hover:text-white transition-colors">
                   Submit Grievance
                 </Link>
               </li>
               <li>
-                <Link href="/admin/adminlogin" className="text-[#94A3B8] hover:text-white transition-colors">
+                <Link href="/admin/adminlogin" className="text-white/70 hover:text-white transition-colors">
                   Official Admin Portal
                 </Link>
               </li>
@@ -62,19 +62,19 @@ const Footer: React.FC = () => {
 
           {/* Contact Helpdesk */}
           <div>
-            <h4 className="text-xs font-heading font-bold uppercase tracking-wider text-[#94A3B8] mb-4">
+            <h3 className="text-xs font-heading font-bold uppercase tracking-wider text-white/70 mb-4">
               State Helpdesk
-            </h4>
+            </h3>
             <div className="space-y-2.5 text-xs">
-              <div className="flex items-start gap-2 text-[#CBD5E1]">
+              <div className="flex items-start gap-2 text-white/80">
                 <MapPin size={14} className="text-[#F36D21] mt-0.5 flex-shrink-0" />
                 <span>Dispur, Guwahati, Assam - 781006</span>
               </div>
-              <div className="flex items-start gap-2 text-[#CBD5E1]">
+              <div className="flex items-start gap-2 text-white/80">
                 <Mail size={14} className="text-[#F36D21] mt-0.5 flex-shrink-0" />
                 <span>support@portal.assam</span>
               </div>
-              <div className="flex items-start gap-2 text-[#CBD5E1]">
+              <div className="flex items-start gap-2 text-white/80">
                 <Phone size={14} className="text-[#F36D21] mt-0.5 flex-shrink-0" />
                 <span>1800-345-3677 (Toll-Free)</span>
               </div>
@@ -83,16 +83,16 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Bottom copyright & disclaimer */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#64748B]">
+        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#94A3B8]">
           <p>© {new Date().getFullYear()} Jan Sambad Assam. People · Districts · A Stronger Assam.</p>
           <div className="flex items-center gap-4">
-            <Link href="/#about" className="hover:text-[#94A3B8]">About</Link>
+            <Link href="/#about" className="hover:text-white">About</Link>
             <span>•</span>
-            <Link href="/#how-it-works" className="hover:text-[#94A3B8]">How It Works</Link>
+            <Link href="/#how-it-works" className="hover:text-white">How It Works</Link>
             <span>•</span>
-            <Link href="/#faqs" className="hover:text-[#94A3B8]">FAQs</Link>
+            <Link href="/#faqs" className="hover:text-white">FAQs</Link>
             <span>•</span>
-            <Link href="/#contact" className="hover:text-[#94A3B8]">Helpdesk</Link>
+            <Link href="/#contact" className="hover:text-white">Helpdesk</Link>
           </div>
         </div>
       </div>

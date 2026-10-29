@@ -101,15 +101,15 @@ export default function Home() {
             
             {/* Left Column: Heading, Subtitle, Actions, Trust Indicators */}
             <div className="lg:col-span-5 z-10">
-              <div className="text-[10px] font-bold tracking-[0.25em] text-[#687180] uppercase mb-3">
+              <div className="text-xs font-bold tracking-wider text-[#687180] uppercase mb-3">
                 PEOPLE · DISTRICTS · A STRONGER ASSAM
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-[62px] font-heading font-extrabold text-[#111318] leading-[1.05] tracking-tight mb-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-[#111318] leading-[1.05] tracking-tight mb-4">
                 Every
                 Concern<br />
                 Builds a<br />
-                <span className="font-script text-5xl sm:text-6xl lg:text-[70px] text-[#285A91] font-bold block mt-0.5 leading-none">
+                <span className="font-script text-5xl sm:text-6xl lg:text-6xl text-[#285A91] font-bold block mt-0.5 leading-none">
                   Better Assam
                 </span>
               </h1>
@@ -204,7 +204,7 @@ export default function Home() {
                 </div>
 
                 {/* Regional Motto Tag (Bottom Left) */}
-                <div className="absolute bottom-4 left-5 z-20 bg-white/95 backdrop-blur-sm border border-[#DEDCD5] rounded-xl px-3 py-1.5 text-[9px] text-[#687180] font-semibold leading-tight shadow-xs">
+                <div className="absolute bottom-4 left-5 z-20 bg-white/95 backdrop-blur-sm border border-[#DEDCD5] rounded-xl px-3 py-1.5 text-xs text-[#394454] font-semibold leading-tight shadow-xs">
                   <div>OUR DISTRICTS</div>
                   <div>OUR COMMUNITIES</div>
                   <div className="text-[#111318] font-bold">OUR TOMORROW</div>
@@ -232,7 +232,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] leading-none">35</div>
-                  <div className="text-xs text-[#687180] font-medium mt-1">Districts Covered</div>
+                  <div className="text-xs text-[#394454] font-medium mt-1">Districts Covered</div>
                 </div>
               </div>
 
@@ -245,7 +245,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] leading-none">100+</div>
-                  <div className="text-xs text-[#687180] font-medium mt-1">Grievance Categories</div>
+                  <div className="text-xs text-[#394454] font-medium mt-1">Grievance Categories</div>
                 </div>
               </div>
 
@@ -258,7 +258,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] leading-none">72 hr</div>
-                  <div className="text-xs text-[#687180] font-medium mt-1">Avg. Resolution Time</div>
+                  <div className="text-xs text-[#394454] font-medium mt-1">Avg. Resolution Time</div>
                 </div>
               </div>
 
@@ -271,7 +271,7 @@ export default function Home() {
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] leading-none">Free</div>
-                  <div className="text-xs text-[#687180] font-medium mt-1">For Every Citizen</div>
+                  <div className="text-xs text-[#394454] font-medium mt-1">For Every Citizen</div>
                 </div>
               </div>
             </div>
@@ -301,7 +301,7 @@ export default function Home() {
             
             {/* Left Introduction Column */}
             <div className="lg:col-span-4 pr-2 flex flex-col justify-center">
-              <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#687180] block mb-1.5">
+              <span className="text-xs font-bold tracking-wider uppercase text-[#687180] block mb-1.5">
                 ACCESS PORTALS
               </span>
               <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] leading-tight tracking-tight mb-2">
@@ -343,7 +343,7 @@ export default function Home() {
               <div className="relative z-10 p-6 flex flex-col justify-between h-full">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-[#687180]">
+                    <span className="text-xs font-bold tracking-wider uppercase text-[#394454]">
                       FOR RESIDENTS
                     </span>
                     {/* Illustrated Citizen Badge */}
@@ -414,7 +414,7 @@ export default function Home() {
               <div className="relative z-10 p-6 flex flex-col justify-between h-full">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <span className="text-[10px] font-bold tracking-wider uppercase text-blue-200/80">
+                    <span className="text-xs font-bold tracking-wider uppercase text-white">
                       FOR OFFICIALS
                     </span>
                     {/* Illustrated Colonnade Emblem Badge */}
@@ -429,7 +429,7 @@ export default function Home() {
                     District Administrator
                   </h3>
 
-                  <div className="space-y-3 text-xs text-slate-200 mb-6">
+                  <div className="space-y-3 text-xs text-white/90 mb-6">
                     <div className="flex items-start gap-2">
                       <div className="w-4 h-4 rounded-full bg-blue-500/30 text-blue-300 flex items-center justify-center flex-shrink-0 mt-0.5">
                         <Check size={11} strokeWidth={3} />
@@ -473,14 +473,14 @@ export default function Home() {
             <div className="lg:col-span-5 relative">
               <div className="relative w-full h-64 sm:h-72 mask-blend-right">
                 <Image
-                  src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Village_Road_in_Assam.jpg"
+                  src="/Village_Road_in_Assam.jpg"
                   alt="Rural Assam community life"
                   fill
                   className="object-cover object-left"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#F7F6F2] via-transparent to-transparent" />
               </div>
-              <div className="absolute bottom-2 left-4 z-10">
+              <div className="absolute bottom-2 left-4 z-10 bg-[#F7F6F2]/90 backdrop-blur-xs px-2.5 py-1 rounded-lg">
                 <span className="font-script text-2xl sm:text-3xl text-[#111318] font-bold block leading-tight">
                   From Villages to a Stronger Assam
                 </span>
@@ -490,8 +490,8 @@ export default function Home() {
             {/* Right: 4-Step Process Timeline with Graphic Badges */}
             <div className="lg:col-span-7">
               <div className="mb-4">
-                <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#F36D21] block mb-1">
-                  A SIMPLE 4-STEP PROCESSS
+                <span className="text-xs font-bold tracking-wider uppercase text-[#A84A1A] block mb-1">
+                  A Simple 4-Step Process
                 </span>
                 <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] tracking-tight">
                   How It Works
@@ -501,11 +501,11 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 relative">
                 {/* Step 1: Terracotta */}
                 <div className="relative flex flex-col items-start bg-[#FAF9F5] border border-[#DEDCD5] rounded-2xl p-3.5">
-                  <div className="w-7 h-7 rounded-full bg-[#FBE9DA] text-[#F36D21] flex items-center justify-center font-heading font-bold text-xs mb-2 shadow-xs">
+                  <div className="w-7 h-7 rounded-full bg-[#FBE9DA] text-[#A84A1A] flex items-center justify-center font-heading font-bold text-xs mb-2 shadow-xs">
                     01
                   </div>
-                  <h4 className="text-xs font-heading font-bold text-[#111318] mb-1">Register Your Profile</h4>
-                  <p className="text-[11px] text-[#687180] leading-relaxed">
+                  <h3 className="text-xs font-heading font-bold text-[#111318] mb-1">Register Your Profile</h3>
+                  <p className="text-xs text-[#687180] leading-relaxed">
                     Create your citizen account and specify your district and village/ward.
                   </p>
                 </div>
@@ -515,19 +515,19 @@ export default function Home() {
                   <div className="w-7 h-7 rounded-full bg-[#E8F0F8] text-[#285A91] flex items-center justify-center font-heading font-bold text-xs mb-2 shadow-xs">
                     02
                   </div>
-                  <h4 className="text-xs font-heading font-bold text-[#111318] mb-1">Admin Verification</h4>
-                  <p className="text-[11px] text-[#687180] leading-relaxed">
+                  <h3 className="text-xs font-heading font-bold text-[#111318] mb-1">Admin Verification</h3>
+                  <p className="text-xs text-[#687180] leading-relaxed">
                     Your district administrator reviews and verifies your profile.
                   </p>
                 </div>
 
                 {/* Step 3: Tea Green */}
                 <div className="relative flex flex-col items-start bg-[#FAF9F5] border border-[#DEDCD5] rounded-2xl p-3.5">
-                  <div className="w-7 h-7 rounded-full bg-[#E3F5EC] text-[#23845B] flex items-center justify-center font-heading font-bold text-xs mb-2 shadow-xs">
+                  <div className="w-7 h-7 rounded-full bg-[#E3F5EC] text-[#186343] flex items-center justify-center font-heading font-bold text-xs mb-2 shadow-xs">
                     03
                   </div>
-                  <h4 className="text-xs font-heading font-bold text-[#111318] mb-1">Lodge Your Complaint</h4>
-                  <p className="text-[11px] text-[#687180] leading-relaxed">
+                  <h3 className="text-xs font-heading font-bold text-[#111318] mb-1">Lodge Your Complaint</h3>
+                  <p className="text-xs text-[#687180] leading-relaxed">
                     Submit your grievance with location, category and supporting evidence.
                   </p>
                 </div>
@@ -537,8 +537,8 @@ export default function Home() {
                   <div className="w-7 h-7 rounded-full bg-[#E8EEF5] text-[#102A43] flex items-center justify-center font-heading font-bold text-xs mb-2 shadow-xs">
                     04
                   </div>
-                  <h4 className="text-xs font-heading font-bold text-[#111318] mb-1">Resolution &amp; Closure</h4>
-                  <p className="text-[11px] text-[#687180] leading-relaxed">
+                  <h3 className="text-xs font-heading font-bold text-[#111318] mb-1">Resolution &amp; Closure</h3>
+                  <p className="text-xs text-[#687180] leading-relaxed">
                     Field teams inspect, take action and mark the issue resolved.
                   </p>
                 </div>
@@ -555,8 +555,8 @@ export default function Home() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
             
             <div className="lg:col-span-4 pr-2">
-              <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#687180] block mb-1">
-                DEPARTMENTAL COVERAGE
+              <span className="text-xs font-bold tracking-wider text-[#687180] block mb-1">
+                Departmental Coverage
               </span>
               <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] tracking-tight leading-tight mb-2">
                 Grievance<br />Categories
@@ -576,7 +576,7 @@ export default function Home() {
                       <path d="M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm-8 14H6v-2h5v2zm0-4H6v-2h5v2zm0-4H6V8h5v2zm7 8h-5v-2h5v2zm0-4h-5v-2h5v2zm0-4h-5V8h5v2z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#111318] leading-tight">Roads &amp;<br />Bridges</span>
+                  <span className="text-xs font-heading font-bold text-[#111318] leading-tight">Roads &amp;<br />Bridges</span>
                 </div>
 
                 {/* 2. Drinking Water */}
@@ -586,7 +586,7 @@ export default function Home() {
                       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#111318] leading-tight">Drinking<br />Water</span>
+                  <span className="text-xs font-heading font-bold text-[#111318] leading-tight">Drinking<br />Water</span>
                 </div>
 
                 {/* 3. Electricity & Power */}
@@ -596,7 +596,7 @@ export default function Home() {
                       <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#111318] leading-tight">Electricity<br />&amp; Power</span>
+                  <span className="text-xs font-heading font-bold text-[#111318] leading-tight">Electricity<br />&amp; Power</span>
                 </div>
 
                 {/* 4. Healthcare */}
@@ -606,7 +606,7 @@ export default function Home() {
                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#111318] leading-tight">Health<br />care</span>
+                  <span className="text-xs font-heading font-bold text-[#111318] leading-tight">Health<br />care</span>
                 </div>
 
                 {/* 5. Schools & Education */}
@@ -616,7 +616,7 @@ export default function Home() {
                       <path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#111318] leading-tight">Schools &amp;<br />Education</span>
+                  <span className="text-xs font-heading font-bold text-[#111318] leading-tight">Schools &amp;<br />Education</span>
                 </div>
 
                 {/* 6. Sanitation & Waste */}
@@ -626,7 +626,7 @@ export default function Home() {
                       <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#111318] leading-tight">Sanitation<br />&amp; Waste</span>
+                  <span className="text-xs font-heading font-bold text-[#111318] leading-tight">Sanitation<br />&amp; Waste</span>
                 </div>
 
                 {/* 7. More Categories */}
@@ -636,7 +636,7 @@ export default function Home() {
                       <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
                     </svg>
                   </div>
-                  <span className="text-[11px] font-heading font-bold text-[#687180] leading-tight">More<br />Categories</span>
+                  <span className="text-xs font-heading font-bold text-[#687180] leading-tight">More<br />Categories</span>
                 </div>
 
               </div>
@@ -653,7 +653,7 @@ export default function Home() {
             
             {/* Left Column: Frequently Asked Questions */}
             <div className="lg:col-span-6">
-              <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-[#687180] block mb-1">
+              <span className="text-xs font-bold tracking-wider uppercase text-[#687180] block mb-1">
                 COMMON INQUIRIES
               </span>
               <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-[#111318] tracking-tight mb-1.5">
@@ -679,7 +679,7 @@ export default function Home() {
                         <span className="text-xs font-heading font-semibold text-[#111318] pr-3">
                           {faq.q}
                         </span>
-                        <span className="text-base font-bold text-[#687180] flex-shrink-0">
+                        <span aria-hidden="true" className="text-base font-bold text-[#111318] flex-shrink-0">
                           {isOpen ? "−" : "+"}
                         </span>
                       </button>
@@ -705,7 +705,7 @@ export default function Home() {
             {/* Right Column: Citizen Support & Helpdesk Form */}
             <div id="contact" className="lg:col-span-6 bg-white border border-[#DEDCD5] rounded-3xl p-5 sm:p-6 shadow-xs">
               <div className="mb-4">
-                <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-[#F36D21] block mb-0.5">
+                <span className="text-xs font-bold tracking-wider uppercase text-[#A84A1A] block mb-0.5">
                   GET IN TOUCH
                 </span>
                 <h3 className="text-xl font-heading font-extrabold text-[#111318] tracking-tight">
@@ -736,7 +736,7 @@ export default function Home() {
                           placeholder="Full Name"
                           value={contactForm.fullName}
                           onChange={(e) => setContactForm({ ...contactForm, fullName: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#94A3B8] focus:outline-none focus:border-[#111318] bg-[#F7F6F2]"
+                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#687180]/60 focus:outline-none focus:border-[#111318] bg-[#F7F6F2]"
                         />
                       </div>
 
@@ -746,7 +746,7 @@ export default function Home() {
                           placeholder="Email Address"
                           value={contactForm.email}
                           onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#94A3B8] focus:outline-none focus:border-[#111318] bg-[#F7F6F2]"
+                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#687180]/60 focus:outline-none focus:border-[#111318] bg-[#F7F6F2]"
                         />
                       </div>
 
@@ -756,7 +756,7 @@ export default function Home() {
                           placeholder="Contact Number"
                           value={contactForm.contactNumber}
                           onChange={(e) => setContactForm({ ...contactForm, contactNumber: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#94A3B8] focus:outline-none focus:border-[#111318] bg-[#F7F6F2]"
+                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#687180]/60 focus:outline-none focus:border-[#111318] bg-[#F7F6F2]"
                         />
                       </div>
 
@@ -766,7 +766,7 @@ export default function Home() {
                           placeholder="Your Message"
                           value={contactForm.message}
                           onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#94A3B8] focus:outline-none focus:border-[#111318] bg-[#F7F6F2] resize-none"
+                          className="w-full px-3 py-2 rounded-xl border border-[#DEDCD5] text-xs text-[#111318] placeholder-[#687180]/60 focus:outline-none focus:border-[#111318] bg-[#F7F6F2] resize-none"
                         />
                       </div>
 
@@ -792,8 +792,8 @@ export default function Home() {
                         </svg>
                       </div>
                       <div>
-                        <div className="text-[10px] font-heading font-bold text-[#111318]">support@portal.assam</div>
-                        <div className="text-[9px] text-[#687180]">Support Email</div>
+                        <div className="text-xs font-heading font-bold text-[#111318]">support@portal.assam</div>
+                        <div className="text-xs text-[#687180]">Support Email</div>
                       </div>
                     </div>
 
@@ -804,8 +804,8 @@ export default function Home() {
                         </svg>
                       </div>
                       <div>
-                        <div className="text-[10px] font-heading font-bold text-[#111318]">1800-345-3677</div>
-                        <div className="text-[9px] text-[#687180]">Toll-Free Helpline</div>
+                        <div className="text-xs font-heading font-bold text-[#111318]">1800-345-3677</div>
+                        <div className="text-xs text-[#687180]">Toll-Free Helpline</div>
                       </div>
                     </div>
 
@@ -816,8 +816,8 @@ export default function Home() {
                         </svg>
                       </div>
                       <div>
-                        <div className="text-[10px] font-heading font-bold text-[#111318]">Mon – Sat: 9AM – 5PM</div>
-                        <div className="text-[9px] text-[#687180]">Operational Hours</div>
+                        <div className="text-xs font-heading font-bold text-[#111318]">Mon – Sat: 9AM – 5PM</div>
+                        <div className="text-xs text-[#687180]">Operational Hours</div>
                       </div>
                     </div>
                   </div>
