@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from 'next/image'
+import { MessagesSquare } from 'lucide-react'
 import { useRouter } from "next/navigation";
 import { FaShieldAlt, FaLock, FaUserSecret, FaKey, FaBuilding, FaArrowRight, FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -75,18 +75,13 @@ export default function SuperAdminLoginPortal({ secretPath }: Props) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col justify-center items-center p-4">
+    <div className="auth-shell text-slate-800 flex flex-col justify-center items-center p-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-6">
-          <div className="w-20 h-20 rounded-xl mx-auto mb-3 flex items-center justify-center text-2xl shadow-sm">
-            <Image
-              src="/logo.png"
-              width={500}
-              height={500}
-              alt="Picture of the author"
-            />
+          <div className="w-16 h-16 rounded-2xl bg-[#234a36] text-[#e8edce] mx-auto mb-4 flex items-center justify-center shadow-sm">
+            <MessagesSquare size={29} strokeWidth={1.8} aria-hidden="true" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-heading font-extrabold text-[#12221f] tracking-tight">
             Central Command HQ
           </h1>
           <p className="text-xs text-slate-500 mt-1">
@@ -94,7 +89,7 @@ export default function SuperAdminLoginPortal({ secretPath }: Props) {
           </p>
         </div>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+        <div className="auth-card bg-white/95 p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1.5">
@@ -107,7 +102,7 @@ export default function SuperAdminLoginPortal({ secretPath }: Props) {
                 placeholder="superadmin@party.org"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-colors"
+                className="w-full bg-[#f7f8f5] border border-[#dce5df] focus:border-[#17745c] rounded-xl px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 transition-colors"
               />
             </div>
 
@@ -123,7 +118,7 @@ export default function SuperAdminLoginPortal({ secretPath }: Props) {
                   placeholder="••••••••••••"
                   value={formData.password}
                   onChange={handleChange}
-                  className="w-full bg-white border border-slate-300 focus:border-slate-900 rounded-lg px-3.5 py-2.5 pr-10 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-slate-900 transition-colors"
+                  className="w-full bg-[#f7f8f5] border border-[#dce5df] focus:border-[#17745c] rounded-xl px-3.5 py-2.5 pr-10 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 transition-colors"
                 />
                 <button
                   type="button"
@@ -139,7 +134,7 @@ export default function SuperAdminLoginPortal({ secretPath }: Props) {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full mt-2 bg-slate-900 hover:bg-slate-800 text-white font-medium py-2.5 px-4 rounded-lg shadow-sm transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full mt-2 bg-[#123b47] hover:bg-[#1b5c68] text-white font-semibold py-3 px-4 rounded-full shadow-sm transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               {isLoading ? (
                 <span>Authenticating Credentials...</span>

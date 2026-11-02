@@ -1,10 +1,11 @@
 'use client'
 
-import { FaUserShield, FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa'
+import { FaSignInAlt, FaEye, FaEyeSlash } from 'react-icons/fa'
 import Link from 'next/link'
-import Image from 'next/image'
+import { MessagesSquare } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import AuthShowcase from '../../components/AuthShowcase'
 
 export default function AdminLogin() {
   const router = useRouter()
@@ -77,19 +78,16 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      <div className="flex-grow flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
-          <div className="text-center mb-6">
-           <div className="w-20 h-20 rounded-xl mx-auto mb-3 flex items-center justify-center text-2xl shadow-sm">
-                      <Image
-                        src="/logo.png"
-                        width={500}
-                        height={500}
-                        alt="Picture of the author"
-                      />
-                    </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+    <div className="auth-shell text-slate-800 flex flex-col font-sans">
+      <div className="flex-grow flex items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-6xl grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-16 items-center">
+          <AuthShowcase eyebrow="District operations" title="Local action. Visible progress." description="A dedicated workspace for district officials to review grievances, verify citizens, and keep communities informed." />
+          <div className="w-full max-w-md mx-auto">
+          <div className="text-center mb-6 relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-[#234a36] text-[#e8edce] mx-auto mb-4 flex items-center justify-center shadow-sm">
+              <MessagesSquare size={29} strokeWidth={1.8} aria-hidden="true" />
+            </div>
+            <h1 className="text-3xl font-heading font-extrabold text-[#12221f] tracking-tight">
               District Admin Portal
             </h1>
             <p className="text-xs text-slate-500 mt-1">
@@ -97,7 +95,7 @@ export default function AdminLogin() {
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+          <div className="auth-card bg-white/95 p-6 sm:p-8">
             {error && (
               <div className="mb-4 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
                 {error}
@@ -115,7 +113,7 @@ export default function AdminLogin() {
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-colors"
+                   className="w-full px-3.5 py-2.5 border border-[#dce5df] rounded-xl bg-[#f7f8f5] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c] transition-colors"
                   placeholder="admin.kamrup@party.org"
                   required
                 />
@@ -132,7 +130,7 @@ export default function AdminLogin() {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 pr-10 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900 focus:border-slate-900 transition-colors"
+                     className="w-full px-3.5 py-2.5 pr-10 border border-[#dce5df] rounded-xl bg-[#f7f8f5] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c] transition-colors"
                     placeholder="••••••••••••"
                     required
                   />
@@ -150,7 +148,7 @@ export default function AdminLogin() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                 className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-[#123b47] hover:bg-[#1b5c68] text-white text-sm font-semibold rounded-full shadow-sm transition-colors cursor-pointer disabled:opacity-50"
               >
                 <FaSignInAlt className="text-sm" />
                 <span>{isLoading ? 'Authenticating...' : 'Sign In to District Dashboard'}</span>
@@ -165,6 +163,7 @@ export default function AdminLogin() {
                 ← Return to Public Home
               </Link>
             </div>
+          </div>
           </div>
         </div>
       </div>

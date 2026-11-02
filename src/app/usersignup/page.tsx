@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { FaUserPlus, FaCheckCircle, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { ASSAM_DISTRICTS } from '@/config/districts'
+import AuthShowcase from '../components/AuthShowcase'
 
 export default function UserSignup() {
   const [formData, setFormData] = useState({
@@ -84,19 +85,23 @@ export default function UserSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      <div className="flex-grow container mx-auto px-4 py-8 flex items-center justify-center">
-        <div className="max-w-3xl w-full">
+    <div className="auth-shell text-slate-800 flex flex-col font-sans">
+      <div className="flex-grow container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-10 items-start">
+          <div className="lg:sticky lg:top-8">
+            <AuthShowcase eyebrow="Join your community" title="Your voice belongs in the conversation." description="Create a citizen profile, choose your district, and help your community move forward together." />
+          </div>
+          <div className="w-full min-w-0">
           <div className="mb-4">
             <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors">
               ← Return to Home
             </Link>
           </div>
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl mx-auto mb-3 shadow-sm">
+          <div className="text-center mb-6 relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-[#dce5df] text-[#17745c] flex items-center justify-center text-xl mx-auto mb-4 shadow-lg">
               <FaUserPlus />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-3xl font-heading font-extrabold text-[#12221f] tracking-tight">
               Citizen Profile Registration
             </h1>
             <p className="text-xs text-slate-500 mt-1">
@@ -104,7 +109,7 @@ export default function UserSignup() {
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
+          <div className="auth-card bg-white/95 p-6 sm:p-8">
             {error && (
               <div className="mb-6 p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs rounded-lg">
                 {error}
@@ -124,7 +129,7 @@ export default function UserSignup() {
                     onChange={handleChange}
                     placeholder="First name"
                     required
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                     className="w-full px-3.5 py-2 border border-[#dce5df] rounded-xl bg-[#f7f8f5] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c] transition-colors"
                   />
                 </div>
 
@@ -168,7 +173,7 @@ export default function UserSignup() {
                     value={formData.district}
                     onChange={handleChange}
                     required
-                    className="w-full px-3.5 py-2 border border-slate-300 rounded-lg text-sm text-slate-900 bg-white focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                     className="w-full px-3.5 py-2 border border-[#dce5df] rounded-xl text-sm text-slate-900 bg-[#f7f8f5] focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c] transition-colors"
                   >
                     {ASSAM_DISTRICTS.map((d) => (
                       <option key={d} value={d}>
@@ -320,7 +325,7 @@ export default function UserSignup() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-sm shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                   className="w-full py-3 bg-[#17745c] hover:bg-[#125c49] text-white font-semibold rounded-full text-sm shadow-sm transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? 'Registering Citizen Profile...' : 'Complete Registration'}
                 </button>
@@ -330,7 +335,7 @@ export default function UserSignup() {
             <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
               <p>
                 Already registered?{' '}
-                <Link href="/userlogin" className="text-blue-600 hover:text-blue-700 font-medium">
+                 <Link href="/userlogin" className="text-[#17745c] hover:text-[#125c49] font-medium">
                   Sign in here
                 </Link>
               </p>
@@ -338,6 +343,7 @@ export default function UserSignup() {
                 ← Back to Home
               </Link>
             </div>
+          </div>
           </div>
         </div>
       </div>
@@ -356,7 +362,7 @@ export default function UserSignup() {
               <div className="space-y-2">
                 <Link
                   href="/userlogin"
-                  className="block w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium rounded-lg transition-colors"
+                   className="block w-full py-3 bg-[#234a36] hover:bg-[#326448] text-white text-xs font-semibold rounded-full transition-colors"
                 >
                   Go to Citizen Login
                 </Link>

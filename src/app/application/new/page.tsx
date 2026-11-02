@@ -288,7 +288,7 @@ export default function NewApplicationPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="portal-shell min-h-screen bg-slate-50 flex flex-col font-sans">
       <NavBar />
 
       {/* Success Popup */}
@@ -311,7 +311,7 @@ export default function NewApplicationPage() {
 
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Breadcrumbs */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+         <div className="portal-header flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
               <Link href="/" className="hover:text-slate-900">Portal Home</Link>
@@ -348,7 +348,7 @@ export default function NewApplicationPage() {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="space-y-6 mt-6">
           {/* Section 1: Grievance Summary & Category */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
+           <div className="form-section bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="text-sm font-bold text-slate-900">1. Grievance Classification</h2>
               <p className="text-xs text-slate-500 mt-0.5">Specify category and summarize the problem.</p>
@@ -406,7 +406,7 @@ export default function NewApplicationPage() {
           </div>
 
           {/* Section 2: Location & Jurisdiction */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
+           <div className="form-section bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="text-sm font-bold text-slate-900">2. Geographic Location in Assam</h2>
               <p className="text-xs text-slate-500 mt-0.5">District authorities route grievances based on administrative revenue circles.</p>
@@ -480,7 +480,7 @@ export default function NewApplicationPage() {
           </div>
 
           {/* Section 3: Applicant Details */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
+           <div className="form-section bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="text-sm font-bold text-slate-900">3. Citizen Identification</h2>
               <p className="text-xs text-slate-500 mt-0.5">Pre-filled from your registered citizen profile.</p>
@@ -549,7 +549,7 @@ export default function NewApplicationPage() {
           </div>
 
           {/* Section 4: Photo or Evidence Attachment */}
-          <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
+           <div className="form-section bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-4">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="text-sm font-bold text-slate-900">4. Attach Supporting Evidence (Optional)</h2>
               <p className="text-xs text-slate-500 mt-0.5">Upload a clear photo of the site, damage, or relevant notice.</p>
@@ -565,7 +565,7 @@ export default function NewApplicationPage() {
 
             <div
               onClick={triggerFileInput}
-              className="border-2 border-dashed border-slate-300 hover:border-slate-400 rounded-xl p-6 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50"
+              className="border-2 border-dashed border-[#b9d5cb] hover:border-[#17745c] rounded-2xl p-8 text-center cursor-pointer transition-all bg-[#f0f7f3] hover:bg-[#e6f2ec]"
             >
               <FaCloudUploadAlt className="text-3xl text-slate-400 mx-auto mb-2" />
               {selectedFile ? (

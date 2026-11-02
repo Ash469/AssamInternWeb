@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
+import { MessagesSquare } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   FaChartPie,
@@ -9,7 +9,6 @@ import {
   FaUsers,
   FaBullhorn,
   FaSignOutAlt,
-  FaUserShield,
 } from "react-icons/fa";
 
 interface AdminNavbarProps {
@@ -20,7 +19,6 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [adminName, setAdminName] = useState<string>("Admin");
-  const [adminRole, setAdminRole] = useState<string>("district_admin");
   const [assignedDistrict, setAssignedDistrict] = useState<string | null>(null);
 
   useEffect(() => {
@@ -29,7 +27,6 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
       try {
         const u = JSON.parse(userDataStr);
         setAdminName(u.name || u.firstName || "District Official");
-        setAdminRole(u.role || "district_admin");
         setAssignedDistrict(u.assignedDistrict || null);
       } catch (e) {
         console.error("Error reading userData", e);
@@ -81,27 +78,22 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
       : "dashboard");
 
   return (
-    <header className="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <header className="bg-[#f7f8f5]/90 backdrop-blur-xl border-b border-[#dce5df] sticky top-0 z-40 shadow-xs">
 
 
       {/* Main navigation header */}
-      <div className="container mx-auto px-4 sm:px-8 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div className="container mx-auto px-4 sm:px-8 py-4 flex flex-col lg:flex-row justify-between items-center gap-4">
         {/* Brand / Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg  text-white flex items-center justify-center font-bold text-lg shadow-sm">
-            <Image
-              src="/logo.png"
-              width={500}
-              height={500}
-              alt="Picture of the author"
-            />
+          <div className="w-11 h-11 rounded-2xl bg-[#234a36] text-[#e8edce] flex items-center justify-center font-bold text-lg shadow-sm">
+            <MessagesSquare size={24} strokeWidth={1.8} aria-hidden="true" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-none">
+               <h2 className="text-lg font-heading font-extrabold text-[#12221f] tracking-tight leading-none">
                 {assignedDistrict ? `${assignedDistrict} In-Charge` : "District Administration"}
               </h2>
-              <span className="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-semibold uppercase px-2 py-0.5 rounded">
+                 <span className="bg-[#e6f2f2] text-[#1c6680] border border-[#cde4e3] text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full">
                 Official
               </span>
             </div>
@@ -112,7 +104,7 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
         </div>
 
         {/* Navigation Tabs */}
-        <nav className="flex items-center gap-1.5 p-1 bg-slate-100/80 rounded-xl border border-slate-200">
+         <nav className="flex max-w-full items-center gap-1.5 overflow-x-auto p-1 bg-[#eaf2ee] rounded-2xl border border-[#dce5df]">
           {navLinks.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeKey === tab.key;
@@ -120,13 +112,13 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
               <Link
                 key={tab.key}
                 href={tab.href}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                 className={`flex shrink-0 items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-white text-slate-900 shadow-sm border border-slate-200/80 font-semibold"
-                    : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                     ? "bg-white text-[#12221f] shadow-sm border border-[#dce5df] font-semibold"
+                     : "text-[#71817d] hover:text-[#12221f] hover:bg-white/70"
                 }`}
               >
-                <Icon className={`text-xs ${isActive ? "text-slate-900" : "text-slate-400"}`} />
+                 <Icon className={`text-xs ${isActive ? "text-[#d95f31]" : "text-[#9aaca5]"}`} />
                 <span>{tab.label}</span>
               </Link>
             );
@@ -137,9 +129,9 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/profile"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors"
+             className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#dce5df] hover:bg-[#edf5f1] text-[#40524e] text-xs font-medium transition-colors"
           >
-            <div className="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">
+             <div className="w-6 h-6 rounded-full bg-[#123b47] text-white flex items-center justify-center text-[10px] font-bold">
               {adminName.charAt(0).toUpperCase()}
             </div>
             <span className="hidden sm:inline">Profile</span>
@@ -147,7 +139,7 @@ export default function AdminNavbar({ currentTab }: AdminNavbarProps) {
 
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-medium transition-colors cursor-pointer"
+             className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#fce8dc] hover:bg-[#f8d9c9] text-[#b94a28] border border-[#f2c8b5] text-xs font-medium transition-colors cursor-pointer"
           >
             <FaSignOutAlt className="text-xs" />
             <span className="hidden sm:inline">Logout</span>

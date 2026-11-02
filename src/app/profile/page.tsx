@@ -236,7 +236,7 @@ export default function ProfilePage() {
   const isVerified = profile?.verified === true || profile?.verificationStatus === "approved";
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="portal-shell min-h-screen bg-slate-50 flex flex-col font-sans">
       <NavBar />
 
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -266,7 +266,7 @@ export default function ProfilePage() {
         ) : (
           <div className="space-y-6">
             {/* Header Card: Citizen Identity & Actions */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+             <div className="interactive-card bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
               <div className="flex items-center gap-4 sm:gap-6">
                 {/* Avatar Initial Circle */}
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-900 text-white flex items-center justify-center text-2xl sm:text-3xl font-bold shadow-xs flex-shrink-0">
@@ -335,8 +335,8 @@ export default function ProfilePage() {
             </div>
 
             {/* Quick Metrics & Grievance Activity */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 dashboard-grid">
+               <div className="metric-card bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-500">Total Grievances Filed</span>
                   <FaClipboardList className="text-slate-400 text-sm" />
@@ -350,7 +350,7 @@ export default function ProfilePage() {
                 </Link>
               </div>
 
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+               <div className="metric-card bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-amber-600">Under District Review</span>
                   <FaClock className="text-amber-500 text-sm" />
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                 <p className="text-[11px] text-slate-400 mt-1">Under official processing</p>
               </div>
 
-              <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
+               <div className="metric-card bg-white p-5 rounded-xl border border-slate-200 shadow-xs">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-emerald-600">Action Taken & Resolved</span>
                   <FaCheckCircle className="text-emerald-500 text-sm" />

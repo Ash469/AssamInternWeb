@@ -200,12 +200,12 @@ export default function ApplicationStatusPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="portal-shell min-h-screen bg-slate-50 flex flex-col font-sans">
       <NavBar />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Breadcrumb & Actions */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
+         <div className="portal-header flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-200">
           <div>
             <div className="flex items-center gap-2 text-xs text-slate-500 mb-1">
               <Link href="/" className="hover:text-slate-900 transition-colors">Portal Home</Link>
@@ -239,20 +239,20 @@ export default function ApplicationStatusPage() {
         </div>
 
         {/* Metric Quick Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-6">
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 my-6 dashboard-grid">
+          <div className="metric-card bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
             <p className="text-xs font-medium text-slate-500">Total Applications</p>
             <p className="text-2xl font-bold text-slate-900 mt-1">{stats.total}</p>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div className="metric-card bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
             <p className="text-xs font-medium text-amber-600">Under Review</p>
             <p className="text-2xl font-bold text-amber-700 mt-1">{stats.pending}</p>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div className="metric-card bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
             <p className="text-xs font-medium text-emerald-600">Action Taken / Resolved</p>
             <p className="text-2xl font-bold text-emerald-700 mt-1">{stats.resolved}</p>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+          <div className="metric-card bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
             <p className="text-xs font-medium text-rose-600">Rejected</p>
             <p className="text-2xl font-bold text-rose-700 mt-1">{stats.rejected}</p>
           </div>
@@ -341,7 +341,7 @@ export default function ApplicationStatusPage() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredApps.map((app) => {
               const displayTitle = app.problemTitle || app.remarks || 'Civic Infrastructure Grievance';
               const appIdShort = app._id ? app._id.substring(app._id.length - 6).toUpperCase() : 'APP';
@@ -350,7 +350,7 @@ export default function ApplicationStatusPage() {
                 <div
                   key={app._id}
                   onClick={() => setSelectedApp(app)}
-                  className="group bg-white rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all p-5 flex flex-col justify-between cursor-pointer relative"
+                   className="interactive-card group bg-white rounded-2xl border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all p-5 flex flex-col justify-between cursor-pointer relative"
                 >
                   <div>
                     {/* Top Row: Category and Status */}

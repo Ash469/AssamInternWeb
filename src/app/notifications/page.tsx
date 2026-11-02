@@ -111,33 +111,25 @@ export default function NotificationsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="portal-shell min-h-screen bg-white flex flex-col">
       <NavBar />
       <div className="flex-grow">
-        <section className="relative h-[300px] overflow-hidden">
-          {/* Spline background */}
-          <div className="absolute inset-0 w-full h-full">
-            <div className="absolute inset-0 bg-green-500/30 z-[1]"></div>
-            {/* <Spline 
-              scene="https://prod.spline.design/Pogqf2P4pTEDp9b5/scene.splinecode" 
-            /> */}
-          </div>
-          <div className="relative z-10 h-full flex items-center justify-center">
-            <div className="text-center max-w-2xl px-6">
-              <h2 className="text-4xl font-bold mb-4 text-black">
+        <section className="page-hero relative py-20 sm:py-24 px-6">
+          <div className="relative z-10 max-w-5xl mx-auto">
+              <p className="text-xs font-bold tracking-[.2em] uppercase text-[#f7c6a8] mb-4">Citizen bulletin</p>
+              <h2 className="text-4xl sm:text-6xl font-heading font-extrabold mb-4 text-white max-w-2xl leading-[1.02]">
                 Stay Up to Date with Notifications
               </h2>
-              <p className="text-lg text-black/80">
+              <p className="text-base text-white/75 max-w-xl leading-relaxed">
                 Keep track of all important updates and messages in one centralized location.
                 Never miss an important notification again!
               </p>
-            </div>
           </div>
         </section>
-        <section className="bg-gray-100 py-10 px-6 md:px-16">
-          <div className="bg-white rounded-xl shadow-md overflow-hidden">
-            <div className="p-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-teal-800">Recent Notifications</h3>
+         <section className="bg-[#eaf2ee] py-16 px-6 md:px-16">
+           <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-md overflow-hidden border border-[#dce5df]">
+             <div className="p-6 border-b border-[#eaf0eb]">
+               <h3 className="text-xl font-heading font-extrabold text-[#123b47]">Recent Notifications</h3>
             </div>
             
             {loading ? (
@@ -158,7 +150,7 @@ export default function NotificationsPage() {
                 {notifications.map((notification) => (
                   <li 
                     key={notification._id} 
-                    className="border-b last:border-b-0 border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                     className="border-b last:border-b-0 border-[#eaf0eb] hover:bg-[#f0f7f3] transition-colors cursor-pointer"
                     onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="px-6 py-4 flex items-start">
@@ -167,8 +159,8 @@ export default function NotificationsPage() {
                       </div>
                       
                       <div className="flex-1 min-w-0">
-                        <p className="text-base font-semibold text-teal-800">{notification.title}</p>
-                        <p className="text-sm text-gray-800 mt-0.5">{notification.content}</p>
+                         <p className="text-base font-heading font-bold text-[#123b47]">{notification.title}</p>
+                         <p className="text-sm text-[#40524e] mt-0.5">{notification.content}</p>
                       </div>
                       
                       <div className="ml-3 flex flex-col items-end">

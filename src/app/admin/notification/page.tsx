@@ -166,12 +166,12 @@ export default function NotificationManagement() {
 
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+      <div className="portal-shell min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
         <AdminNavbar currentTab="notification" />
 
         <main className="container mx-auto px-4 sm:px-8 py-8 flex-grow">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+           <div className="portal-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                 Broadcasts & Public Notices
@@ -193,7 +193,7 @@ export default function NotificationManagement() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left: Compose Notice */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-xl border border-slate-200 shadow-xs p-5 sticky top-24">
+              <div className="form-section bg-white rounded-xl border border-slate-200 shadow-xs p-5 sticky top-24">
                 <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100">
                   <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xs">
                     <FaPlus />
@@ -279,7 +279,7 @@ export default function NotificationManagement() {
                     {notifications.map((item, index) => (
                       <div
                         key={item._id || index}
-                        className="p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-all bg-white"
+                        className="interactive-card p-4 rounded-xl border border-slate-200 hover:border-slate-300 transition-all bg-white"
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-grow">

@@ -56,7 +56,7 @@ export default function AdminProfilePage() {
 
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+      <div className="portal-shell min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
         <AdminNavbar />
 
         <main className="container mx-auto px-4 sm:px-8 py-10 flex-grow flex items-center justify-center">

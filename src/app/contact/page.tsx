@@ -1,11 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import axios from 'axios';
 import { FaEnvelope, FaUser, FaPhone, FaCommentAlt, FaPaperPlane } from 'react-icons/fa';
 import NavBar from '../components/nav_bar';
 import Footer from '../components/footer';
-// import Spline from '@splinetool/react-spline';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +16,6 @@ const Contact = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const router = useRouter();
 
 
 
@@ -75,36 +72,29 @@ const Contact = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-[#f7f8f5]">
       <NavBar />
-      <section className="relative h-[200px] overflow-hidden">
-        {/* Spline background */}
-        <div className="absolute inset-0 w-full h-full">
-          <div className="absolute inset-0 bg-green-500/30 z-[1]"></div>
-          {/* <Spline 
-            scene="https://prod.spline.design/Pogqf2P4pTEDp9b5/scene.splinecode" 
-          /> */}
-        </div>
-        <div className="relative z-10 h-full flex items-center justify-center">
-          <div className="text-center max-w-2xl px-6">
-            <h2 className="text-3xl font-bold mb-2 text-black">Connect with Us</h2>
-            <p className="text-base text-black/80">Have questions or feedback? We&apos;re here to help.</p>
-          </div>
+      <section className="page-hero page-hero--contact relative py-16 sm:py-20 px-6">
+        <div className="relative z-10 max-w-6xl mx-auto">
+          <p className="text-xs font-bold tracking-[.2em] uppercase text-[#f7c6a8] mb-3">State support desk</p>
+          <h1 className="text-4xl sm:text-5xl font-heading font-extrabold">Let&apos;s make the next step easier.</h1>
+          <p className="text-white/75 mt-4 max-w-xl">Questions about your grievance? Share the details and our team will guide you.</p>
         </div>
       </section>
 
       <div className="max-w-6xl mx-auto px-4 py-8 flex-grow w-full">
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-[0_18px_60px_rgba(21,55,48,.1)] overflow-hidden border border-[#dce5df]">
           <div className="md:flex">
-            <div className="bg-teal-700 text-white p-8 md:w-2/5">
-              <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
+            <div className="bg-[#123b47] text-white p-8 md:w-2/5 relative overflow-hidden">
+              <div className="absolute -right-12 -bottom-14 w-48 h-48 border border-white/10 rounded-full" />
+              <h2 className="text-2xl font-heading font-bold mb-6 relative">Contact Information</h2>
               
               <div className="space-y-5">
                 <div className="flex items-start">
                   <FaEnvelope className="mt-1 mr-3 flex-shrink-0 text-base" />
                   <div>
                     <p className="font-medium">Email</p>
-                    <p className="text-sm text-white/90">support@officemgmt.gov.in</p>
+                    <p className="text-sm text-white/90">support@portal.assam</p>
                   </div>
                 </div>
                 
@@ -112,7 +102,7 @@ const Contact = () => {
                   <FaPhone className="mt-1 mr-3 flex-shrink-0 text-base" />
                   <div>
                     <p className="font-medium">Phone</p>
-                    <p className="text-sm text-white/90">+91 1234567890</p>
+                    <p className="text-sm text-white/90">1800-345-3677</p>
                   </div>
                 </div>
                 
@@ -120,12 +110,12 @@ const Contact = () => {
                   <FaUser className="mt-1 mr-3 flex-shrink-0 text-base" />
                   <div>
                     <p className="font-medium">Office Hours</p>
-                    <p className="text-sm text-white/90">Monday - Friday: 9 AM - 5 PM</p>
+                    <p className="text-sm text-white/90">Monday - Saturday: 9 AM - 5 PM</p>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="p-8 md:w-3/5">
+            <div className="p-8 md:w-3/5 bg-[#fcfdfb]">
               {submitted && (
                 <div className="bg-green-100 text-green-700 p-4 rounded-lg mb-5 flex items-center">
                   <div className="bg-green-200 rounded-full p-1 mr-3">
@@ -159,7 +149,7 @@ const Contact = () => {
                     placeholder="Full Name"
                     value={formData.fullName}
                     onChange={handleChange}
-                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full p-3 pl-10 border border-[#dce5df] rounded-xl bg-[#f7f8f5] focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c]"
                   />
                 </div>
 
@@ -173,7 +163,7 @@ const Contact = () => {
                     placeholder="Email"
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full p-3 pl-10 border border-[#dce5df] rounded-xl bg-[#f7f8f5] focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c]"
                   />
                 </div>
 
@@ -188,7 +178,7 @@ const Contact = () => {
                     value={formData.contactNumber}
                     onChange={handleChange}
                     maxLength={10}
-                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full p-3 pl-10 border border-[#dce5df] rounded-xl bg-[#f7f8f5] focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c]"
                   />
                 </div>
 
@@ -202,14 +192,14 @@ const Contact = () => {
                     value={formData.message}
                     onChange={handleChange}
                     rows={4}
-                    className="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full p-3 pl-10 border border-[#dce5df] rounded-xl bg-[#f7f8f5] focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c]"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-teal-600 text-white py-3 px-6 rounded-lg hover:bg-teal-700 transition-colors flex items-center justify-center"
+                  className="w-full bg-[#d95f31] text-white py-3 px-6 rounded-full hover:bg-[#bd4d25] transition-colors flex items-center justify-center font-semibold"
                 >
                   {isLoading ? (
                     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -135,7 +135,7 @@ export default function SummaryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="auth-shell min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
       </div>
     );
@@ -143,7 +143,7 @@ export default function SummaryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="auth-shell min-h-screen flex items-center justify-center">
         <div className="text-red-500 text-center">
           <p className="text-xl">{error}</p>
           <button onClick={refresh} className="mt-4 bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-600">
@@ -155,9 +155,9 @@ export default function SummaryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="portal-shell min-h-screen bg-gray-100">
       <NavBar />
-      <section className="bg-teal-800 text-white py-10 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between relative">
+       <section className="page-hero text-white py-12 px-6 md:px-16 flex flex-col md:flex-row items-center justify-between relative">
         {/* Back Button */}
         <Link href="/userdashboard" className="absolute top-4 left-4 md:top-6 md:left-6 flex items-center text-white bg-teal-700 hover:bg-teal-600 transition-colors px-3 py-2 rounded-lg border border-teal-500 shadow-md">
           <FaChevronLeft className="mr-1" />
@@ -181,8 +181,8 @@ export default function SummaryPage() {
       </section>
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white p-6 rounded-xl shadow-lg mb-6">
-          <h2 className="text-xl font-bold text-teal-700 mb-4">Applications Overview</h2>
+         <div className="bg-white p-6 rounded-3xl shadow-lg mb-6 border border-[#dce5df]">
+           <h2 className="text-xl font-heading font-extrabold text-[#123b47] mb-4">Applications Overview</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <StatCard
               title="Total Applications"
@@ -212,8 +212,8 @@ export default function SummaryPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h2 className="text-xl font-bold text-teal-700 mb-4">Application Status</h2>
+           <div className="bg-white p-6 rounded-3xl shadow-lg border border-[#dce5df]">
+             <h2 className="text-xl font-heading font-extrabold text-[#123b47] mb-4">Application Status</h2>
             <ProgressBar 
               label="Approved" 
               value={stats.approvedApplications} 
@@ -234,8 +234,8 @@ export default function SummaryPage() {
             />
           </div>
 
-          <div className="bg-white p-6 rounded-xl shadow-lg">
-            <h2 className="text-xl font-bold text-teal-700 mb-4">Category Distribution</h2>
+           <div className="bg-white p-6 rounded-3xl shadow-lg border border-[#dce5df]">
+             <h2 className="text-xl font-heading font-extrabold text-[#123b47] mb-4">Category Distribution</h2>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>

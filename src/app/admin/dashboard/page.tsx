@@ -96,7 +96,7 @@ export default function AdminHome() {
 
   return (
     <AdminRouteProtection>
-      <div className="flex flex-col min-h-screen bg-slate-50 font-sans text-slate-800">
+      <div className="portal-shell flex flex-col min-h-screen bg-slate-50 font-sans text-slate-800">
         <AdminNavbar currentTab="dashboard" />
 
         {isLoading ? (
@@ -118,7 +118,7 @@ export default function AdminHome() {
         ) : (
           <main className="container mx-auto px-4 sm:px-8 py-8 flex-grow space-y-6">
             {/* Header / Overview Title */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+             <div className="portal-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
               <div>
                 <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                   District Operations Overview
@@ -130,8 +130,8 @@ export default function AdminHome() {
             </div>
 
             {/* Top Metric Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 dashboard-grid">
+              <div className="metric-card bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Total Grievances
@@ -148,7 +148,7 @@ export default function AdminHome() {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+              <div className="metric-card bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Registered Citizens
@@ -165,7 +165,7 @@ export default function AdminHome() {
                 </div>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+              <div className="metric-card bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Resolution Rate
@@ -182,7 +182,7 @@ export default function AdminHome() {
                 </p>
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
+              <div className="metric-card bg-white border border-slate-200 rounded-xl p-5 shadow-xs">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                     Pending Verification

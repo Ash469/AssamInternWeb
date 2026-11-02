@@ -148,12 +148,12 @@ const AdminUser: React.FC = () => {
 
   return (
     <AdminRouteProtection>
-      <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+      <div className="portal-shell min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
         <AdminNavbar currentTab="user" />
 
         <main className="container mx-auto px-4 sm:px-8 py-8 flex-grow">
           {/* Header row */}
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+           <div className="portal-header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
                 Registered Citizens
@@ -247,7 +247,7 @@ const AdminUser: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+            <div className="data-table-shell bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>

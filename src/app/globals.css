@@ -2,108 +2,153 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════════════════
-   JAN SAMBAD ASSAM — MASTER EDITORIAL DESIGN TOKENS
-   Specification: Assamese Cultural Editorial meets Public Infrastructure
-   ─────────────────────────────────────────────────────────────
-   • Paper (Canvas):       #F7F6F2
-   • Pure White:           #FFFFFF
-   • Primary Ink:          #111318
-   • Body Text:            #394454
-   • Muted Text:           #687180
-   • Assam Blue:           #285A91
-   • Terracotta Orange:    #F36D21
-   • Deep Navy:            #102A43
-   • Tea Green:            #23845B
-   • Border:               #DEDCD5
-   • Pale Blue:            #E8F0F8
-   • Pale Orange:          #FBE9DA
-═══════════════════════════════════════════════════════════════ */
-
 :root {
-  --color-paper: #F7F6F2;
-  --color-white: #FFFFFF;
-  --color-ink: #111318;
-  --color-body: #394454;
-  --color-muted: #687180;
-  --color-blue: #285A91;
-  --color-terracotta: #F36D21;
-  --color-navy: #102A43;
-  --color-green: #23845B;
-  --color-border: #DEDCD5;
-  --color-pale-blue: #E8F0F8;
-  --color-pale-orange: #FBE9DA;
+  --color-paper: #f7f8f5;
+  --color-white: #ffffff;
+  --color-ink: #12221f;
+  --color-body: #40524e;
+  --color-muted: #71817d;
+  --color-blue: #1c6680;
+  --color-terracotta: #d95f31;
+  --color-navy: #123b47;
+  --color-green: #17745c;
+  --color-border: #dce5df;
+  --color-pale-blue: #e6f2f2;
+  --color-pale-orange: #fce8dc;
+  --shadow-soft: 0 18px 60px rgba(21, 55, 48, 0.08);
+  --shadow-card: 0 8px 26px rgba(21, 55, 48, 0.07);
 }
 
 @layer base {
-  html {
-    scroll-behavior: smooth;
-    -webkit-tap-highlight-color: transparent;
-  }
+  html { scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
 
   body {
     font-family: var(--font-body), system-ui, -apple-system, sans-serif;
-    background-color: #F7F6F2;
-    color: #111318;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-image: radial-gradient(rgba(18, 59, 71, 0.045) 0.7px, transparent 0.7px);
+    background-size: 18px 18px;
   }
 
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading), system-ui, sans-serif;
-    letter-spacing: -0.025em;
+    letter-spacing: -0.035em;
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
+  input, select, textarea { font-family: inherit; }
+  button, a { -webkit-tap-highlight-color: transparent; }
 
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  ::-webkit-scrollbar-track {
-    background: #F7F6F2;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #DEDCD5;
-    border-radius: 9999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #687180;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--color-paper); }
+  ::-webkit-scrollbar-thumb { background: #c8d5cf; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-muted); }
+  ::selection { background: #cde8df; color: var(--color-ink); }
 }
 
 @layer utilities {
-  .font-heading {
-    font-family: var(--font-heading), sans-serif;
-  }
-  .font-body {
-    font-family: var(--font-body), sans-serif;
-  }
-  .font-script {
-    font-family: var(--font-script), cursive;
-  }
+  .font-heading { font-family: var(--font-heading), sans-serif; }
+  .font-body { font-family: var(--font-body), sans-serif; }
+  .font-script { font-family: var(--font-script), cursive; }
 
-  /* Organic image blending masks for seamless background integration */
-  .mask-blend-right {
-    mask-image: linear-gradient(to right, black 60%, transparent 98%);
-    -webkit-mask-image: linear-gradient(to right, black 60%, transparent 98%);
+  .interactive-card { transition: transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, border-color .35s ease; }
+  .interactive-card:hover { transform: translateY(-7px); box-shadow: var(--shadow-soft); border-color: rgba(23,116,92,.28) !important; }
+  .soft-shadow { box-shadow: var(--shadow-card); }
+  .section-kicker { color: var(--color-terracotta); font-size: .68rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+
+  .page-hero { position: relative; overflow: hidden; background: linear-gradient(90deg, #153b33 0%, rgba(21,59,51,.91) 52%, rgba(21,59,51,.56) 100%), url('/images/brahmaputra.webp') center / cover; color: white; }
+  .page-hero--faq { background-image: linear-gradient(90deg, #153b33 0%, rgba(21,59,51,.86) 55%, rgba(21,59,51,.42) 100%), url('/images/tea-estate.webp'); }
+  .page-hero--contact { background-image: linear-gradient(90deg, #153b33 0%, rgba(21,59,51,.87) 55%, rgba(21,59,51,.38) 100%), url('/images/majuli-home.webp'); }
+  .page-hero::after { content: ""; position: absolute; width: 420px; height: 420px; right: -120px; top: -190px; border: 1px solid rgba(255,255,255,.22); border-radius: 48% 52% 62% 38%; transform: rotate(24deg); }
+
+  .auth-shell { min-height: 100vh; background: linear-gradient(135deg, #edf5f1 0%, #f8f7f2 52%, #fbe8dc 100%); position: relative; overflow: hidden; }
+  .auth-shell::before, .auth-shell::after { content: ""; position: absolute; border-radius: 999px; filter: blur(2px); pointer-events: none; }
+  .auth-shell::before { width: 420px; height: 420px; background: rgba(28,102,128,.11); left: -180px; top: 8%; }
+  .auth-shell::after { width: 360px; height: 360px; background: rgba(217,95,49,.10); right: -140px; bottom: -100px; }
+  .auth-card { position: relative; z-index: 1; border: 1px solid rgba(220,229,223,.95) !important; border-radius: 1.5rem !important; box-shadow: 0 24px 70px rgba(18,59,71,.12) !important; }
+
+  .portal-shell { background: linear-gradient(180deg, #f3f7f4 0%, var(--color-paper) 40%) !important; }
+  .portal-shell .border-slate-200 { border-color: var(--color-border) !important; }
+  .portal-shell .border-slate-100 { border-color: #eaf0eb !important; }
+  .portal-shell .shadow-xs { box-shadow: var(--shadow-card) !important; }
+  .portal-shell main > div > .bg-white,
+  .portal-shell main > .bg-white,
+  .portal-shell main .rounded-xl.border,
+  .portal-shell main .rounded-2xl.border { box-shadow: var(--shadow-card); }
+  .portal-shell input, .portal-shell select, .portal-shell textarea { border-radius: .75rem; }
+  .portal-shell button, .portal-shell a { transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease; }
+  .portal-shell main a:hover, .portal-shell main button:hover { transform: translateY(-1px); }
+  .portal-shell table tbody tr { transition: background-color .2s ease; }
+  .portal-shell table tbody tr:hover { background-color: #f0f7f3 !important; }
+
+  .portal-header {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 155px;
+    padding: 28px 32px !important;
+    border: 0 !important;
+    border-radius: 26px;
+    background: linear-gradient(100deg, #173e37 0%, rgba(23,62,55,.96) 58%, rgba(23,62,55,.65) 100%), url('/images/tea-estate.webp') center 55% / cover;
+    box-shadow: 0 22px 50px rgba(21,55,48,.14);
   }
-  .mask-blend-left {
-    mask-image: linear-gradient(to left, black 60%, transparent 98%);
-    -webkit-mask-image: linear-gradient(to left, black 60%, transparent 98%);
+  .portal-header::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    width: 220px;
+    height: 220px;
+    right: 10%;
+    bottom: -180px;
+    border: 1px solid rgba(255,255,255,.22);
+    border-radius: 50%;
+    box-shadow: 0 0 0 55px rgba(255,255,255,.04);
+    pointer-events: none;
   }
-  .mask-blend-bottom {
-    mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  .portal-shell main .portal-header h1 { color: #fff !important; font-family: var(--font-heading), sans-serif; }
+  .portal-shell main .portal-header p { color: rgba(255,255,255,.78) !important; font-size: .875rem; line-height: 1.6; }
+  .portal-shell main .portal-header p strong { color: #e3efc9 !important; }
+  .portal-shell main .portal-header > div > div:first-child > span,
+  .portal-shell main .portal-header > div > span { color: rgba(255,255,255,.7); }
+  .portal-shell main .portal-header a:not([class*="bg-"]) { color: #e3efc9; }
+  .portal-shell main .portal-header a:not([class*="bg-"]):hover { color: #fff; }
+  .superadmin-shell > header h1, .superadmin-shell > header p { color: white !important; }
+  .superadmin-shell > header .text-slate-500 { color: #c9d9c6 !important; }
+  .superadmin-shell .state-tabs button.bg-slate-900 { background: #234a36; }
+  .superadmin-shell .state-tabs button { border-radius: 999px; }
+
+  .dashboard-grid > div,
+  .portal-shell main > .bg-white,
+  .portal-shell main > div > .bg-white { border-radius: 1.25rem; }
+  .dashboard-grid > div { transition: transform .3s ease, box-shadow .3s ease; }
+  .dashboard-grid > div:hover { transform: translateY(-4px); box-shadow: var(--shadow-soft); }
+
+  .data-table-shell { border: 1px solid var(--color-border); border-radius: 1.25rem; overflow: hidden; background: white; box-shadow: var(--shadow-card); }
+  .data-table-shell thead tr { background: #edf5f1 !important; color: #40524e !important; }
+  .data-table-shell tbody tr { border-color: #edf2ee !important; }
+
+  .form-section { position: relative; overflow: hidden; border-radius: 1.35rem !important; border-color: var(--color-border) !important; box-shadow: var(--shadow-card) !important; }
+  .form-section::before { content: ""; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, var(--color-terracotta), var(--color-green)); }
+  .form-section > * { position: relative; }
+
+  .metric-card { position: relative; overflow: hidden; }
+  .metric-card::after { content: ""; position: absolute; width: 90px; height: 90px; right: -30px; top: -35px; border-radius: 999px; background: rgba(217,95,49,.09); }
+
+  .status-pill { border-radius: 999px !important; padding-left: .75rem !important; padding-right: .75rem !important; }
+
+  .portal-shell main h1 { font-size: clamp(1.85rem, 3vw, 2.55rem); line-height: 1.15; color: var(--color-ink); }
+  .portal-shell main h2 { font-size: clamp(1.15rem, 2vw, 1.5rem); }
+  .portal-shell main h3 { font-size: 1.08rem; }
+  .portal-shell main input:focus-visible,
+  .portal-shell main textarea:focus-visible,
+  .portal-shell main select:focus-visible { outline: 2px solid rgba(23,116,92,.3); outline-offset: 1px; }
+
+  a:focus-visible, button:focus-visible { outline: 3px solid #d95f31; outline-offset: 3px; }
+
+  @media (max-width: 640px) {
+    .portal-header { padding: 24px !important; }
   }
-  .mask-watercolor-edge {
-    mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 65%, transparent 100%);
-    -webkit-mask-image: radial-gradient(ellipse 90% 85% at 50% 50%, black 65%, transparent 100%);
-  }
-  .mask-brush-landscape {
-    mask-image: linear-gradient(to right, black 70%, transparent 98%), linear-gradient(to bottom, black 70%, transparent 98%);
-    -webkit-mask-image: linear-gradient(to right, black 70%, transparent 98%), linear-gradient(to bottom, black 70%, transparent 98%);
-  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
 }

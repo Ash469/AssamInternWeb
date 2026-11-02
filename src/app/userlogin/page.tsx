@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import jwt_decode from 'jwt-decode';
+import AuthShowcase from '../components/AuthShowcase';
 
 interface UserProfile {
   _id?: string;
@@ -147,19 +148,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      <div className="flex-grow flex items-center justify-center p-4">
-        <div className="max-w-md w-full">
+    <div className="auth-shell text-slate-800 flex flex-col font-sans">
+      <div className="flex-grow flex items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-6xl grid lg:grid-cols-[1fr_1fr] gap-8 lg:gap-16 items-center">
+          <AuthShowcase eyebrow="The citizen portal" title="A better Assam begins with being heard." description="Bring local issues to the right district team and follow every step toward resolution." />
+          <div className="w-full max-w-md mx-auto">
           <div className="mb-4">
             <Link href="/" className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-900 transition-colors">
               ← Return to Home
             </Link>
           </div>
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 rounded-xl bg-blue-600 text-white flex items-center justify-center text-xl mx-auto mb-3 shadow-sm">
+          <div className="text-center mb-6 relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-[#dce5df] text-[#17745c] flex items-center justify-center text-xl mx-auto mb-4 shadow-lg">
               <FaUser />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            <h1 className="text-3xl font-heading font-extrabold text-[#12221f] tracking-tight">
               Citizen Portal Login
             </h1>
             <p className="text-xs text-slate-500 mt-1">
@@ -167,15 +170,15 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-6 sm:p-8 shadow-sm">
-            <div className="flex justify-center gap-2 mb-6 p-1 bg-slate-100 rounded-lg">
+          <div className="auth-card bg-white/95 p-6 sm:p-8">
+              <div className="flex justify-center gap-2 mb-6 p-1 bg-[#edf5f1] rounded-xl">
               <button
                 type="button"
                 onClick={toggleLoginMethod}
                 className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
-                  loginMethod === 'email' 
-                    ? 'bg-white text-slate-900 shadow-sm' 
-                    : 'text-slate-500 hover:text-slate-800'
+                  loginMethod === 'email'
+                    ? 'bg-white text-[#12221f] shadow-sm'
+                    : 'text-slate-500 hover:text-[#12221f]'
                 }`}
               >
                 Sign in with Email
@@ -184,9 +187,9 @@ export default function LoginPage() {
                 type="button"
                 onClick={toggleLoginMethod}
                 className={`flex-1 py-1.5 text-xs font-semibold rounded-md transition-all cursor-pointer ${
-                  loginMethod === 'phone' 
-                    ? 'bg-white text-slate-900 shadow-sm' 
-                    : 'text-slate-500 hover:text-slate-800'
+                  loginMethod === 'phone'
+                    ? 'bg-white text-[#12221f] shadow-sm'
+                    : 'text-slate-500 hover:text-[#12221f]'
                 }`}
               >
                 Sign in with Phone
@@ -210,7 +213,7 @@ export default function LoginPage() {
                   name="identifier"
                   value={formData.identifier}
                   onChange={handleChange}
-                  className="w-full px-3.5 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                   className="w-full px-3.5 py-2.5 border border-[#dce5df] rounded-xl bg-[#f7f8f5] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c] transition-colors"
                   placeholder={loginMethod === 'email' ? 'yourname@example.com' : '9876543210'}
                   pattern={loginMethod === 'phone' ? '[0-9]{10}' : undefined}
                   required
@@ -228,7 +231,7 @@ export default function LoginPage() {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 pr-10 border border-slate-300 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-1 focus:ring-blue-600 focus:border-blue-600 transition-colors"
+                     className="w-full px-3.5 py-2.5 pr-10 border border-[#dce5df] rounded-xl bg-[#f7f8f5] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#17745c]/20 focus:border-[#17745c] transition-colors"
                     placeholder="••••••••••••"
                     required
                   />
@@ -246,7 +249,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full mt-2 flex items-center justify-center gap-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors cursor-pointer disabled:opacity-50"
+                 className="w-full mt-2 flex items-center justify-center gap-2 py-3 bg-[#17745c] hover:bg-[#125c49] text-white text-sm font-semibold rounded-full shadow-sm transition-colors cursor-pointer disabled:opacity-50"
               >
                 <FaSignInAlt className="text-sm" />
                 <span>{loading ? 'Signing in...' : 'Sign In to Dashboard'}</span>
@@ -256,7 +259,7 @@ export default function LoginPage() {
             <div className="mt-6 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
               <Link 
                 href="/usersignup"
-                className="text-blue-600 hover:text-blue-700 font-medium"
+                 className="text-[#17745c] hover:text-[#125c49] font-medium"
               >
                 Don&apos;t have an account? Register here
               </Link>
@@ -267,6 +270,7 @@ export default function LoginPage() {
                 ← Back to Home
               </Link>
             </div>
+          </div>
           </div>
         </div>
       </div>

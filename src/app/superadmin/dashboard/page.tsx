@@ -278,13 +278,13 @@ export default function SuperAdminDashboard() {
   const totalPendingGrievances = applications.filter((a) => a.status === "Pending").length;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
+    <div className="portal-shell superadmin-shell min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
       {/* Clean Header */}
-      <header className="bg-white border-b border-slate-200 px-6 py-4 sticky top-0 z-40">
+      <header className="bg-[#193e35] border-b border-[#385948] px-6 py-5 sticky top-0 z-40 text-white">
         <div className="container mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold text-lg shadow-sm">
-              ★
+            <div className="w-11 h-11 rounded-2xl bg-[#e8b690] text-[#193e35] flex items-center justify-center font-bold text-xl shadow-sm">
+              ✦
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -293,7 +293,7 @@ export default function SuperAdminDashboard() {
                 </span>
                 <span className="text-slate-500 text-xs">All Assam Scope</span>
               </div>
-              <h1 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight mt-0.5">
+              <h1 className="text-lg sm:text-xl font-heading font-bold text-white tracking-tight mt-0.5">
                 Central Administrator Dashboard
               </h1>
             </div>
@@ -332,7 +332,7 @@ export default function SuperAdminDashboard() {
       {/* Main Body */}
       <div className="container mx-auto px-4 sm:px-6 py-8 flex-grow">
         {/* Navigation Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
+        <div className="state-tabs flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
           <button
             onClick={() => setActiveTab("overview")}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition-colors cursor-pointer ${
@@ -394,7 +394,7 @@ export default function SuperAdminDashboard() {
         {activeTab === "overview" && (
           <div className="space-y-6">
             {/* Stat Cards Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="dashboard-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">

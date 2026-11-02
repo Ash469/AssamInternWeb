@@ -38,7 +38,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${spaceGrotesk.variable} ${manrope.variable} ${caveat.variable} font-sans antialiased bg-[#F7F6F2] text-[#111318]`}
+        className={`${spaceGrotesk.variable} ${manrope.variable} ${caveat.variable} font-sans antialiased bg-[#fbfaf6] text-[#213b2b]`}
       >
         {children}
       </body>

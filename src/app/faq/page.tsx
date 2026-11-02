@@ -1,15 +1,13 @@
 'use client'
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import NavBar from '../components/nav_bar';
 import { FaChevronDown, FaChevronUp} from 'react-icons/fa';
 import Footer from '../components/footer';
-// import Spline from '@splinetool/react-spline';
+import Link from 'next/link';
 
 export default function FAQPage() {
   // State to track which FAQ is open
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  const router = useRouter();
 
 
 
@@ -25,65 +23,51 @@ export default function FAQPage() {
   // FAQ data
   const faqItems = [
     {
-      question: "How do I submit a new application?",
-      answer: "To submit a new application, navigate to the dashboard and click on the 'New application' card. Fill out the required information in the form and upload any necessary documents. Once completed, click the submit button and you will receive a confirmation message."
+      question: "How do I submit a civic grievance?",
+      answer: "Create a citizen account and wait for district verification. Then select Submit a Grievance, choose a category and district, describe the issue, and attach a photo or document if you have one."
     },
     {
       question: "How can I check the status of my application?",
-      answer: "You can check the status of your application by clicking on the 'Application status' card on the dashboard. This will show you a list of all your submitted applications along with their current status (Pending, Approved, or Rejected)."
+      answer: "Select Track Application from the homepage or Applications in the navigation bar. Your grievance list shows current status, district details, and official responses."
     },
     {
-      question: "What documents do I need to upload for my application?",
-      answer: "Required documents vary depending on the type of application. Generally, you'll need identification proof (Aadhaar/PAN), address proof, and application-specific documents. The application form will clearly indicate which documents are required for your specific request."
+      question: "Do I need to upload a document?",
+      answer: "An attachment is optional. If you have a clear photo of the issue or a relevant document, include it to give the district team helpful context."
     },
     {
       question: "How long does it take to process my application?",
-      answer: "Processing times vary depending on the type of application and current workload. Most applications are processed within 7-14 working days. You can always check the current status of your application through the dashboard."
+      answer: "Timing depends on the issue and your district's review process. You can see the most recent status and any official remarks on the tracking page."
     },
     {
       question: "What should I do if my application is rejected?",
-      answer: "If your application is rejected, you'll receive a notification with the reason for rejection. You can review the feedback, make necessary corrections, and resubmit your application. If you need assistance, please contact our support team."
+      answer: "Open the grievance details to review the district response. If you need to provide clearer information, you can submit a new grievance with updated details."
     },
     {
-      question: "Can I update information in my submitted application?",
-      answer: "Once an application is submitted, you cannot directly edit it. However, if you need to make changes, you can contact support with your application ID and request for the specific changes to be made."
+      question: "Can I update a grievance after submitting it?",
+      answer: "Submitted grievances cannot be edited from the portal. If something important is missing, contact the helpdesk or submit a new grievance with the correct information."
     },
     {
-      question: "How do I download my application certificate after approval?",
-      answer: "Once your application is approved, you can download your certificate by going to 'Application status', finding your approved application, and clicking on the 'Download' button next to it."
+      question: "Can I keep a copy of my grievance details?",
+      answer: "Yes. Open your application on the tracking page and use Print Receipt to save or print its details and status."
     }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#f7f8f5]">
       {/* Navbar */}
       <NavBar />
 
       {/* Hero Section */}
-      <section className="relative h-[300px] overflow-hidden">
-        {/* Spline background */}
-        <div className="absolute inset-0 w-full h-full">
-          <div className="absolute inset-0 bg-green-500/30 z-[1]"></div>
-          {/* <Spline 
-            scene="https://prod.spline.design/Pogqf2P4pTEDp9b5/scene.splinecode" 
-          /> */}
-        </div>
-
-        {/* Text content overlay */}
-        <div className="relative z-10 h-full flex items-center justify-center">
-          <div className="text-center max-w-2xl px-6">
-            <h2 className="text-4xl font-bold mb-4 text-black">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-lg text-black/80">
-              Find answers to common questions about our services
-            </p>
-          </div>
+      <section className="page-hero page-hero--faq relative py-20 sm:py-24 px-6">
+        <div className="relative z-10 max-w-5xl mx-auto">
+          <p className="text-xs font-bold tracking-[.2em] uppercase text-[#f7c6a8] mb-4">Citizen helpdesk</p>
+          <h1 className="text-4xl sm:text-6xl font-heading font-extrabold max-w-2xl leading-[1.02]">Answers before you need to ask.</h1>
+          <p className="text-white/75 text-base max-w-xl mt-5 leading-relaxed">Learn how to register, submit a grievance, share evidence, and follow district action.</p>
         </div>
       </section>
 
       {/* Content Section */}
-      <section className="bg-gray-100 py-10 px-6 md:px-16 min-h-screen">
+      <section className="bg-[#eaf2ee] py-16 px-6 md:px-16 min-h-screen">
         <div className="max-w-3xl mx-auto">
 
           {/* FAQ Accordion */}
@@ -91,22 +75,22 @@ export default function FAQPage() {
             {faqItems.map((faq, index) => (
               <div 
                 key={index} 
-                className="bg-white rounded-xl shadow-sm overflow-hidden"
+                className="interactive-card bg-white rounded-2xl border border-[#dce5df] shadow-sm overflow-hidden"
               >
                 <button
                   className="w-full px-6 py-4 flex justify-between items-center focus:outline-none"
                   onClick={() => toggleFaq(index)}
                 >
-                  <span className="font-medium text-left text-gray-800">{faq.question}</span>
+                  <span className="font-heading font-semibold text-left text-[#12221f]">{faq.question}</span>
                   {openFaq === index ? (
-                    <FaChevronUp className="text-teal-600" />
+                    <FaChevronUp className="text-[#d95f31]" />
                   ) : (
-                    <FaChevronDown className="text-teal-600" />
+                    <FaChevronDown className="text-[#d95f31]" />
                   )}
                 </button>
                 
                 {openFaq === index && (
-                  <div className="px-6 pb-4 text-gray-600 border-t border-gray-100 pt-3">
+                  <div className="px-6 pb-4 text-[#40524e] border-t border-[#eaf0eb] pt-3 leading-relaxed">
                     <p>{faq.answer}</p>
                   </div>
                 )}
@@ -115,28 +99,28 @@ export default function FAQPage() {
           </div>
 
           {/* Contact Section */}
-          <div className="bg-gradient-to-r from-teal-50 to-cyan-50 rounded-lg shadow-sm p-5 mt-6 border border-teal-100 flex flex-col md:flex-row items-center justify-between">
+          <div className="bg-[#123b47] text-white rounded-3xl shadow-sm p-7 mt-8 border border-[#1e5963] flex flex-col md:flex-row items-center justify-between">
             <div className="mb-3 md:mb-0">
-              <h3 className="text-lg font-semibold text-teal-800 mb-1">
+                <h3 className="text-lg font-heading font-bold text-white mb-1">
                 Still have questions?
               </h3>
-              <p className="text-gray-700 text-sm">
+                <p className="text-white/65 text-sm">
                 Our support team is here to help with any questions.
               </p>
             </div>
             <div className="flex space-x-3">
-              <a 
-                href="mailto:support@example.com" 
-                className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition text-sm font-medium flex items-center justify-center"
+              <Link
+                href="/#contact"
+                className="px-4 py-2.5 bg-[#d95f31] text-white rounded-full hover:bg-[#bd4d25] transition text-sm font-semibold flex items-center justify-center"
               >
-                Email Us
-              </a>
-              <a 
-                href="/contact" 
-                className="px-4 py-2 bg-white border border-teal-600 text-teal-600 rounded-md hover:bg-teal-50 transition text-sm font-medium flex items-center justify-center"
+                Ask a Question
+              </Link>
+              <Link
+                href="/contact"
+                className="px-4 py-2.5 bg-white border border-white/30 text-[#123b47] rounded-full hover:bg-[#edf5f1] transition text-sm font-semibold flex items-center justify-center"
               >
                 Help Center
-              </a>
+              </Link>
             </div>
           </div>
         </div>

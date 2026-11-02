@@ -1,10 +1,9 @@
 "use client";
 
-import { Menu, X, LogOut, ArrowRight, ListChecks } from "lucide-react";
+import { Menu, X, LogOut, ArrowUpRight, ListChecks, MessagesSquare } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 export default function NavBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -51,55 +50,55 @@ export default function NavBar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-[#F7F6F2]/95 backdrop-blur-md border-b border-[#E8E6DF]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-8">
-        <div className="flex items-center justify-between h-14">
+    <header className="sticky top-0 z-50 bg-[#fbfaf6]/95 backdrop-blur-xl border-b border-[#e6eadf]">
+      <div className="max-w-[1440px] mx-auto px-5 sm:px-10 lg:px-16 xl:px-24">
+        <div className="flex items-center justify-between h-[5rem]">
           {/* Left: Brand mark */}
           <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
-              <Image src="/logo.png" alt="Jan Sambad Logo" width={30} height={30} className="object-contain" priority />
+            <div className="w-11 h-11 rounded-[14px] bg-[#234a36] text-[#e8edce] flex items-center justify-center flex-shrink-0 group-hover:-rotate-6 transition-transform">
+              <MessagesSquare size={25} strokeWidth={1.8} aria-hidden="true" />
             </div>
             <div>
-              <span className="text-sm font-heading font-extrabold text-[#111318] tracking-tight block leading-tight">
+               <span className="text-lg font-heading font-bold text-[#203a2b] tracking-tight block leading-tight">
                 Jan Sambad
               </span>
-              <span className="text-xs font-bold tracking-widest text-[#687180] uppercase block">
+               <span className="text-[10px] font-bold tracking-[.3em] text-[#b86a4d] uppercase block">
                 ASSAM
               </span>
             </div>
           </Link>
 
           {/* Center: Sleek navigation links with terracotta active dot */}
-          <nav className="hidden lg:flex items-center gap-7">
+           <nav className="hidden xl:flex items-center gap-7">
             {navLinks.map((item) => (
               <Link
                 key={item.id}
                 href={item.href}
                 onClick={() => setActiveSection(item.id)}
-                className="relative text-xs font-semibold text-[#394454] hover:text-[#111318] transition-colors py-1 tracking-wide"
+                 className="relative text-[13px] font-semibold text-[#526456] hover:text-[#244f37] transition-colors py-1"
               >
                 {item.label}
                 {activeSection === item.id && (
-                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[#F36D21]" />
+                   <span className="absolute -bottom-2 left-0 w-full h-0.5 rounded-full bg-[#bd704e]" />
                 )}
               </Link>
             ))}
           </nav>
 
           {/* Right: Actions */}
-          <div className="hidden md:flex items-center gap-2.5">
+          <div className="hidden xl:flex items-center gap-2.5">
             {isLoggedIn ? (
               <>
                 <Link
                   href="/application/status"
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#285A91] hover:bg-[#1f4773] text-white text-xs font-semibold transition-all shadow-xs"
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-[#234a36] hover:bg-[#326448] text-white text-xs font-semibold transition-all shadow-xs"
                 >
                   <ListChecks size={13} />
                   <span>Applications</span>
                 </Link>
                 <Link
                   href="/profile"
-                  className="flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[#DEDCD5] hover:bg-[#FAF9F5] text-[#111318] text-xs font-semibold transition-all"
+                   className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#dce5df] hover:bg-[#edf5f1] text-[#12221f] text-xs font-semibold transition-all"
                 >
                   <div className="w-4 h-4 rounded-full bg-[#111318] text-white flex items-center justify-center text-xs font-bold">
                     {userName.charAt(0).toUpperCase()}
@@ -108,7 +107,7 @@ export default function NavBar() {
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="p-1 rounded-full text-[#687180] hover:text-rose-600 hover:bg-rose-50 text-xs transition-colors cursor-pointer"
+                   className="p-1.5 rounded-full text-[#71817d] hover:text-rose-600 hover:bg-rose-50 text-xs transition-colors cursor-pointer"
                   title="Logout"
                 >
                   <LogOut size={14} />
@@ -118,16 +117,16 @@ export default function NavBar() {
               <>
                 <Link
                   href="/userlogin"
-                  className="px-4 py-1.5 rounded-full bg-white border border-[#DEDCD5] text-[#111318] hover:bg-[#F0EEE6] text-xs font-semibold transition-all"
+                   className="px-4 py-2.5 rounded-full bg-transparent text-[#244936] hover:bg-[#e9efdf] text-xs font-semibold transition-all"
                 >
                   Citizen Login
                 </Link>
                 <Link
                   href="/admin/adminlogin"
-                  className="px-4 py-1.5 rounded-full bg-[#111318] hover:bg-black text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-xs"
+                   className="px-4 py-2.5 rounded-full bg-[#234a36] hover:bg-[#326448] text-white text-xs font-semibold transition-all flex items-center gap-1.5 shadow-xs"
                 >
                   <span>Admin Login</span>
-                  <ArrowRight size={12} />
+                   <ArrowUpRight size={14} />
                 </Link>
               </>
             )}
@@ -136,8 +135,9 @@ export default function NavBar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-1.5 rounded-lg text-[#111318] hover:bg-[#EAE8E0] focus:outline-none transition-colors"
+            className="xl:hidden p-2 rounded-xl text-[#12221f] hover:bg-[#eaf2ee] focus:outline-none transition-colors"
             aria-label="Toggle navigation"
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -146,7 +146,7 @@ export default function NavBar() {
 
       {/* Mobile drawer */}
       {isMenuOpen && (
-        <div className="md:hidden bg-[#F7F6F2] border-t border-[#E8E6DF] px-6 py-3 space-y-1">
+        <div className="xl:hidden bg-[#fbfaf6] border-t border-[#dce5df] px-6 py-3 space-y-1 shadow-lg">
           {navLinks.map((item) => (
             <Link
               key={item.id}
@@ -206,7 +206,7 @@ export default function NavBar() {
                   className="px-3 py-2 text-center rounded-full bg-[#111318] text-white text-xs font-semibold flex items-center justify-center gap-1"
                 >
                   <span>Admin Login</span>
-                  <ArrowRight size={12} />
+                   <ArrowUpRight size={14} />
                 </Link>
               </div>
             )}
